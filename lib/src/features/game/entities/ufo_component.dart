@@ -25,7 +25,6 @@ class UfoComponent extends BodyComponent with ContactCallbacks {
           PolygonShape()..set([
             Vector2(-2, 0),
             Vector2(-1, 0.85),
-            Vector2(0, 1),
             Vector2(1, 0.85),
             Vector2(2, 0),
             Vector2(0, -1),
