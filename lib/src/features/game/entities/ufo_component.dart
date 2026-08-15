@@ -5,10 +5,15 @@ import 'package:unstable_flying_object/src/features/game/ufo_game.dart';
 import 'package:unstable_flying_object/src/features/themes/palette.dart';
 
 class UfoComponent extends BodyComponent with ContactCallbacks {
+  static const double kBeamPull = 15;
+  static const double kBeamDamping = 2;
+  static const double kAttachProximity = 3;
+
   final Vector2 initialPosition;
 
   final BeamMarker beamMarker = BeamMarker();
   final Set<AttachableObjectComponent> beamedObjects = {};
+  final Map<AttachableObjectComponent, Vector2> _pendingAttachPoints = {};
 
   UfoComponent({required this.initialPosition}) {
     priority = 127;
@@ -64,20 +69,60 @@ class UfoComponent extends BodyComponent with ContactCallbacks {
   void update(double dt) {
     super.update(dt);
 
-    final rotatedIntent = Rot.mulVec2(
-      body.transform.q,
-      (game as UfoGame).moveIntent,
-    );
-    body.applyForce(rotatedIntent * 100, point: body.worldCenter);
-    body.applyTorque((game as UfoGame).rollIntent * 10);
+    _processPendingAttaches();
+
+    final gameRef = game as UfoGame;
+    final attached = gameRef.weldManager.attached;
+
+    var totalMass = body.mass;
+    var weightedCenter = body.worldCenter * totalMass;
+    for (final obj in attached) {
+      final m = obj.body.mass;
+      totalMass += m;
+      weightedCenter += obj.body.worldCenter * m;
+    }
+    final com = weightedCenter / totalMass;
+    var inertiaAboutCom =
+        body.inertia + body.mass * (body.worldCenter - com).length2;
+    for (final obj in attached) {
+      final offset = obj.body.worldCenter - com;
+      inertiaAboutCom += obj.body.inertia + obj.body.mass * offset.length2;
+    }
+
+    final moveScale = totalMass / body.mass;
+    final rollScale = inertiaAboutCom / body.inertia;
+
+    final rotatedIntent = Rot.mulVec2(body.transform.q, gameRef.moveIntent);
+    body.applyForce(rotatedIntent * 100 * moveScale, point: com);
+    body.applyTorque(gameRef.rollIntent * 10 * rollScale);
 
     for (var obj in beamedObjects) {
+      final delta = body.worldCenter - obj.body.worldCenter;
+      if (delta.length2 < 0.01) continue;
+      final dir = delta.normalized();
       obj.body.applyForce(
-        (body.worldCenter - obj.body.worldCenter).normalized() *
-            obj.body.mass *
-            15,
+        dir * obj.body.mass * kBeamPull,
         point: obj.body.worldCenter,
       );
+      obj.body.applyForce(
+        -obj.body.linearVelocity * obj.body.mass * kBeamDamping,
+        point: obj.body.worldCenter,
+      );
+    }
+  }
+
+  void _processPendingAttaches() {
+    if (_pendingAttachPoints.isEmpty) return;
+
+    final attaches = _pendingAttachPoints.entries.toList();
+    _pendingAttachPoints.clear();
+    for (final entry in attaches) {
+      final obj = entry.key;
+      if (obj.attached) continue;
+      if ((obj.body.worldCenter - body.worldCenter).length > kAttachProximity) {
+        continue;
+      }
+      (game as UfoGame).weldManager.attach(this, obj, entry.value);
     }
   }
 
@@ -97,7 +142,11 @@ class UfoComponent extends BodyComponent with ContactCallbacks {
 
     if (contact.bodyA.userData == this || contact.bodyB.userData == this) {
       if (other is AttachableObjectComponent && !other.attached) {
-        (game as UfoGame).weldManager.attach(this, other, body.worldCenter);
+        final manifold = WorldManifold();
+        contact.getWorldManifold(manifold);
+        if (manifold.points.isNotEmpty) {
+          _pendingAttachPoints[other] = manifold.points.first.clone();
+        }
       }
     }
   }

@@ -17,6 +17,14 @@ class WeldManager {
   void attach(UfoComponent ufo, AttachableObjectComponent obj, Vector2 anchor) {
     if (_attached.contains(obj)) return;
 
+    final ufoVel = ufo.body.linearVelocity;
+    final ufoAng = ufo.body.angularVelocity;
+    final offset = obj.body.worldCenter - ufo.body.worldCenter;
+    obj.body
+      ..linearVelocity = ufoVel + Vector2(-ufoAng * offset.y, ufoAng * offset.x)
+      ..angularVelocity = ufoAng
+      ..setAwake(true);
+
     final def = WeldJointDef<Body, Body>()
       ..initialize(ufo.body, obj.body, anchor)
       ..collideConnected = false;
