@@ -27,6 +27,12 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
   double get rollIntent => _rollIntent;
 
   @override
+  void update(double dt) {
+    super.update(dt);
+    weldManager.processPending();
+  }
+
+  @override
   Color backgroundColor() => Palette.color27.color;
 
   UfoGame()
@@ -102,7 +108,10 @@ class UfoWorld extends Forge2DWorld {
       ], Palette.color14.paint()),
     );
     add(CrateComponent(initialPosition: Vector2(10, 25)));
+    add(CrateComponent(initialPosition: Vector2(15, 25)));
     add(CrateComponent(initialPosition: Vector2(20, 25)));
+    add(CrateComponent(initialPosition: Vector2(25, 25)));
     add(CrateComponent(initialPosition: Vector2(30, 25)));
+    add(CrateComponent(initialPosition: Vector2(35, 25)));
   }
 }
