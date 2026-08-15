@@ -6,6 +6,7 @@ import 'package:flame_forge2d/forge2d_game.dart';
 import 'package:flame_forge2d/forge2d_world.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:unstable_flying_object/src/features/game/entities/attachable_object_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ground_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ufo_component.dart';
 import 'package:unstable_flying_object/src/features/themes/palette.dart';
@@ -96,5 +97,8 @@ class UfoWorld extends Forge2DWorld {
         Vector2(64, 30),
       ], Palette.color14.paint()),
     );
+    add(CrateComponent(initialPosition: Vector2(10, 25)));
+    add(CrateComponent(initialPosition: Vector2(20, 25)));
+    add(CrateComponent(initialPosition: Vector2(30, 25)));
   }
 }
