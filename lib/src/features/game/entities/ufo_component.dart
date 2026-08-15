@@ -1,4 +1,5 @@
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:unstable_flying_object/src/features/game/ufo_game.dart';
 import 'package:unstable_flying_object/src/features/themes/palette.dart';
 
 class UfoComponent extends BodyComponent {
@@ -29,5 +30,13 @@ class UfoComponent extends BodyComponent {
         ..friction = 0.4
         ..restitution = 0.1,
     ];
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    final rotatedIntent = Rot.mulVec2(body.transform.q, (game as UfoGame).moveIntent);
+    body.applyForce(rotatedIntent * 100, point: body.worldCenter);
+    body.applyTorque((game as UfoGame).rollIntent * 10);
   }
 }
