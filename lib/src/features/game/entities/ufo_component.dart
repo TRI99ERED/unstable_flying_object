@@ -90,7 +90,8 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
     }
 
     final moveScale = totalMass / body.mass * gameRef.weldManager.controlScale;
-    final rollScale = inertiaAboutCom / body.inertia;
+    final rollScale =
+        inertiaAboutCom / body.inertia * gameRef.weldManager.controlScale;
 
     final rotatedIntent = Rot.mulVec2(body.transform.q, gameRef.moveIntent);
     body.applyForce(rotatedIntent * 100 * moveScale, point: com);

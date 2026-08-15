@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:unstable_flying_object/src/core/utils/logger.dart';
 
 enum GameState { menu, playing, gameOver }
 
@@ -23,6 +24,8 @@ class GameSession extends ChangeNotifier {
       _bestScore = _score;
     }
     notifyListeners();
+
+    Logger.d(score.toString(), 'GameSession');
   }
 
   void gameOver() {
