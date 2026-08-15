@@ -4,6 +4,8 @@ import 'package:unstable_flying_object/src/features/themes/palette.dart';
 class AttachableObjectComponent extends BodyComponent {
   final Vector2 initialPosition;
 
+  bool attached = false;
+
   AttachableObjectComponent({required this.initialPosition}) {
     priority = 0;
     bodyDef = BodyDef()

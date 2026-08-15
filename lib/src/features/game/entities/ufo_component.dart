@@ -85,10 +85,19 @@ class UfoComponent extends BodyComponent with ContactCallbacks {
   void beginContact(Object other, Contact contact) {
     super.beginContact(other, contact);
 
+    if (other is AttachableObjectComponent && other.attached) return;
+
     if (contact.fixtureA.userData is BeamMarker ||
         contact.fixtureB.userData is BeamMarker) {
       if (other is AttachableObjectComponent) {
         beamedObjects.add(other);
+      }
+      return;
+    }
+
+    if (contact.bodyA.userData == this || contact.bodyB.userData == this) {
+      if (other is AttachableObjectComponent && !other.attached) {
+        (game as UfoGame).weldManager.attach(this, other, body.worldCenter);
       }
     }
   }

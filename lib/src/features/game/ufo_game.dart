@@ -9,12 +9,16 @@ import 'package:flutter/services.dart';
 import 'package:unstable_flying_object/src/features/game/entities/attachable_object_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ground_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ufo_component.dart';
+import 'package:unstable_flying_object/src/features/game/game_session.dart';
+import 'package:unstable_flying_object/src/features/game/systems/weld_manager.dart';
 import 'package:unstable_flying_object/src/features/themes/palette.dart';
 
 class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
   static const double kGameWidth = 1280;
   static const double kGameHeight = 720;
 
+  final GameSession session = GameSession();
+  late final WeldManager weldManager = WeldManager(world, session);
   final Vector2 moveIntent = Vector2.zero();
   final Set<LogicalKeyboardKey> _heldKeys = {};
 
