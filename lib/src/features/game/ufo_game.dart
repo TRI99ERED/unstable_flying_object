@@ -30,12 +30,6 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
   double get rollIntent => _rollIntent;
 
   @override
-  void update(double dt) {
-    super.update(dt);
-    weldManager.processPending();
-  }
-
-  @override
   Color backgroundColor() => Palette.color27.color;
 
   UfoGame()
@@ -51,6 +45,26 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
         ),
         world: UfoWorld(),
       );
+
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    camera.viewfinder.zoom = 10;
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    weldManager.processPending();
+
+    final ufo = world.children.whereType<UfoComponent>().firstOrNull;
+    if (ufo != null) {
+      camera.viewfinder.position = Vector2(
+        ufo.body.position.x,
+        camera.viewfinder.position.y,
+      );
+    }
+  }
 
   @override
   KeyEventResult onKeyEvent(
@@ -163,7 +177,9 @@ class UfoWorld extends Forge2DWorld {
       if (_gameOverTimer! <= 0) {
         _gameOverTimer = null;
         removeAll(children);
-        add(GameOverOverlayComponent(score: _pendingScore!));
+        (findGame() as UfoGame).camera.viewport.add(
+          GameOverOverlayComponent(score: _pendingScore!),
+        );
       }
     }
   }
@@ -176,5 +192,8 @@ class UfoWorld extends Forge2DWorld {
   void reset() {
     _gameOverTimer = null;
     _pendingScore = null;
+    (findGame() as UfoGame).camera.viewport.children
+        .whereType<GameOverOverlayComponent>()
+        .forEach((overlay) => overlay.removeFromParent());
   }
 }

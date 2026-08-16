@@ -33,8 +33,8 @@ class GameOverOverlayComponent extends Component {
   @override
   void render(Canvas canvas) {
     final overlayRect = Rect.fromLTWH(
-      -UfoGame.kGameWidth / 2,
-      -UfoGame.kGameHeight / 2,
+      0,
+      0,
       UfoGame.kGameWidth,
       UfoGame.kGameHeight,
     );
@@ -42,12 +42,15 @@ class GameOverOverlayComponent extends Component {
       ..color = Palette.levelBackgrounds[_colorIndex].color;
     canvas.drawRect(overlayRect, overlayPaint);
 
+    final centerX = UfoGame.kGameWidth / 2;
+    final centerY = UfoGame.kGameHeight / 2;
+
     final messagePainter = TextPainter(
       text: TextSpan(
         text: 'Game Over!',
         style: GameFonts.style(
           color: Palette.color20.color,
-          fontSize: 4.8,
+          fontSize: 48,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -56,26 +59,29 @@ class GameOverOverlayComponent extends Component {
     messagePainter.layout();
     messagePainter.paint(
       canvas,
-      Offset(-messagePainter.width / 2, -messagePainter.height / 2),
+      Offset(
+        centerX - messagePainter.width / 2,
+        centerY - messagePainter.height / 2,
+      ),
     );
 
-    final moveCountPainter = TextPainter(
+    final scorePainter = TextPainter(
       text: TextSpan(
         text: 'Score: $score',
         style: GameFonts.style(
           color: Palette.color20.color,
-          fontSize: 3.2,
+          fontSize: 32,
           fontWeight: FontWeight.w400,
         ),
       ),
       textDirection: TextDirection.ltr,
     );
-    moveCountPainter.layout();
-    moveCountPainter.paint(
+    scorePainter.layout();
+    scorePainter.paint(
       canvas,
       Offset(
-        -moveCountPainter.width / 2,
-        messagePainter.height / 2 + moveCountPainter.height,
+        centerX - scorePainter.width / 2,
+        centerY + messagePainter.height / 2 + scorePainter.height,
       ),
     );
 
@@ -84,7 +90,7 @@ class GameOverOverlayComponent extends Component {
         text: 'Press [R] to Retry',
         style: GameFonts.style(
           color: Palette.color20.color,
-          fontSize: 2.4,
+          fontSize: 24,
           fontWeight: FontWeight.w400,
         ),
       ),
@@ -94,9 +100,10 @@ class GameOverOverlayComponent extends Component {
     retryPainter.paint(
       canvas,
       Offset(
-        -retryPainter.width / 2,
-        messagePainter.height / 2 +
-            moveCountPainter.height +
+        centerX - retryPainter.width / 2,
+        centerY +
+            messagePainter.height / 2 +
+            scorePainter.height +
             retryPainter.height +
             8,
       ),
