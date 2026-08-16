@@ -73,6 +73,7 @@ class WeldManager {
     _attached.add(obj);
     obj.attached = true;
     session.addScore();
+    obj.pop();
   }
 
   void checkCrash(Component component) {
