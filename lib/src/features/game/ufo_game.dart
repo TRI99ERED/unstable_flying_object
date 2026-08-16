@@ -12,6 +12,7 @@ import 'package:unstable_flying_object/src/features/game/entities/attachable_obj
 import 'package:unstable_flying_object/src/features/game/entities/ground_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ufo_component.dart';
 import 'package:unstable_flying_object/src/features/game/game_session.dart';
+import 'package:unstable_flying_object/src/features/game/hud/game_over_overlay_component.dart';
 import 'package:unstable_flying_object/src/features/game/systems/weld_manager.dart';
 import 'package:unstable_flying_object/src/features/themes/palette.dart';
 
@@ -59,10 +60,19 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
     super.onKeyEvent(event, keysPressed);
 
     if (session.state == GameState.gameOver) {
+      _heldKeys.clear();
       moveIntent
         ..x = 0
         ..y = 0;
       _rollIntent = 0;
+
+      if (keysPressed.contains(LogicalKeyboardKey.keyR)) {
+        weldManager.reset();
+        world.spawnLevel();
+        session.start();
+        return KeyEventResult.handled;
+      }
+
       return KeyEventResult.ignored;
     }
 
@@ -113,9 +123,20 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
 }
 
 class UfoWorld extends Forge2DWorld {
+  static const double _gameOverDelaySeconds = 3.0;
+  double? _gameOverTimer;
+  int? _pendingScore;
+
   @override
   FutureOr<void> onLoad() async {
     await super.onLoad();
+
+    spawnLevel();
+  }
+
+  void spawnLevel() {
+    removeAll(children);
+    reset();
 
     add(UfoComponent(initialPosition: Vector2.zero()));
     add(
@@ -132,5 +153,28 @@ class UfoWorld extends Forge2DWorld {
     add(CrateComponent(initialPosition: Vector2(25, 25)));
     add(CrateComponent(initialPosition: Vector2(30, 25)));
     add(CrateComponent(initialPosition: Vector2(35, 25)));
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    if (_gameOverTimer != null) {
+      _gameOverTimer = _gameOverTimer! - dt;
+      if (_gameOverTimer! <= 0) {
+        _gameOverTimer = null;
+        removeAll(children);
+        add(GameOverOverlayComponent(score: _pendingScore!));
+      }
+    }
+  }
+
+  void showGameOverScreen(int score) {
+    _pendingScore = score;
+    _gameOverTimer = _gameOverDelaySeconds;
+  }
+
+  void reset() {
+    _gameOverTimer = null;
+    _pendingScore = null;
   }
 }

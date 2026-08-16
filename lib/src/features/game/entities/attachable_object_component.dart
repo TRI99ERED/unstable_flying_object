@@ -26,6 +26,7 @@ mixin StickyBody on BodyComponent, ContactCallbacks {
         final ufoGame = game as UfoGame;
         ufoGame.session.gameOver();
         ufoGame.shakeScreen();
+        (world as UfoWorld).showGameOverScreen(ufoGame.session.score);
       }
     }
   }
