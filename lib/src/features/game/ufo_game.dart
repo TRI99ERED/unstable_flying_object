@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flame_forge2d/forge2d_game.dart';
 import 'package:flame_forge2d/forge2d_world.dart';
+import 'package:flame_noise/flame_noise.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:unstable_flying_object/src/features/game/entities/attachable_object_component.dart';
@@ -56,6 +58,14 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
   ) {
     super.onKeyEvent(event, keysPressed);
 
+    if (session.state == GameState.gameOver) {
+      moveIntent
+        ..x = 0
+        ..y = 0;
+      _rollIntent = 0;
+      return KeyEventResult.ignored;
+    }
+
     if (event is KeyDownEvent) {
       _heldKeys.add(event.logicalKey);
     } else if (event is KeyUpEvent) {
@@ -90,6 +100,15 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
         : 0;
 
     return KeyEventResult.handled;
+  }
+
+  void shakeScreen() {
+    camera.viewfinder.add(
+      MoveEffect.by(
+        Vector2(1, 1),
+        NoiseEffectController(duration: 0.2, noise: PerlinNoise(frequency: 40)),
+      ),
+    );
   }
 }
 

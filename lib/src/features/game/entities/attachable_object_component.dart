@@ -2,8 +2,9 @@ import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
-import 'package:flame/game.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:unstable_flying_object/src/features/game/entities/ground_component.dart';
+import 'package:unstable_flying_object/src/features/game/entities/ufo_component.dart';
 import 'package:unstable_flying_object/src/features/game/ufo_game.dart';
 import 'package:unstable_flying_object/src/features/themes/palette.dart';
 
@@ -17,6 +18,15 @@ mixin StickyBody on BodyComponent, ContactCallbacks {
     super.beginContact(other, contact);
     if (isSticky && other is AttachableObjectComponent && !other.attached) {
       (game as UfoGame).weldManager.queueAttach(this, other, contact);
+    }
+
+    if (isSticky && other is GroundComponent) {
+      if (contact.fixtureA.userData is! BeamMarker &&
+          contact.fixtureB is! BeamMarker) {
+        final ufoGame = game as UfoGame;
+        ufoGame.session.gameOver();
+        ufoGame.shakeScreen();
+      }
     }
   }
 }

@@ -1,7 +1,5 @@
-import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:unstable_flying_object/src/features/game/entities/attachable_object_component.dart';
-import 'package:unstable_flying_object/src/features/game/entities/ufo_component.dart';
 import 'package:unstable_flying_object/src/features/game/game_session.dart';
 
 class WeldManager {
@@ -74,13 +72,6 @@ class WeldManager {
     obj.attached = true;
     session.addScore();
     obj.pop();
-  }
-
-  void checkCrash(Component component) {
-    if (component is UfoComponent ||
-        component is AttachableObjectComponent && component.attached) {
-      session.gameOver();
-    }
   }
 
   void reset() {

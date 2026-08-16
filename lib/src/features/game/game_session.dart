@@ -33,5 +33,7 @@ class GameSession extends ChangeNotifier {
 
     _state = GameState.gameOver;
     notifyListeners();
+
+    Logger.d('Game over!', 'GameSession');
   }
 }

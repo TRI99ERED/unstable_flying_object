@@ -37,6 +37,7 @@ dependencies:
   flame: ^1.38.0
   flame_forge2d: ^0.19.3+7
   google_fonts: ^8.2.1
+  flame_noise: ^0.3.3+23
 
 dev_dependencies:
   flutter_test:
