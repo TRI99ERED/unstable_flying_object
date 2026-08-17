@@ -22,7 +22,7 @@ mixin StickyBody on BodyComponent, ContactCallbacks {
 
     if (isSticky && other is GroundComponent) {
       if (contact.fixtureA.userData is! BeamMarker &&
-          contact.fixtureB is! BeamMarker) {
+          contact.fixtureB.userData is! BeamMarker) {
         final ufoGame = game as UfoGame;
         ufoGame.session.gameOver();
         ufoGame.shakeScreen();
