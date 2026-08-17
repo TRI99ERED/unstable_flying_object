@@ -86,6 +86,14 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
     _beamTime += dt;
 
     final gameRef = game as UfoGame;
+
+    if (body.position.y < -UfoGame.kGameHeight / 10 / 2) {
+      beamActive = false;
+      gameRef.session.gameOver();
+      (world as UfoWorld).showGameOverScreen(gameRef.session.score);
+      body.setType(BodyType.static);
+    }
+
     final attached = gameRef.weldManager.attached;
 
     var totalMass = body.mass;
