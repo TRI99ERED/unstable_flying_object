@@ -1,5 +1,6 @@
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:unstable_flying_object/src/features/game/entities/attachable_object_component.dart';
+import 'package:unstable_flying_object/src/features/game/entities/spawner_component.dart';
 import 'package:unstable_flying_object/src/features/game/game_session.dart';
 
 class WeldManager {
@@ -8,6 +9,8 @@ class WeldManager {
 
   final Set<AttachableObjectComponent> _attached = {};
   final List<_PendingAttach> _pending = [];
+
+  SpawnerComponent? spawner;
 
   Set<AttachableObjectComponent> get attached => _attached;
   double get controlScale => 1 / (1 + 0.18 * _attached.length);
@@ -72,6 +75,9 @@ class WeldManager {
     obj.attached = true;
     session.addScore();
     obj.pop();
+
+    spawner?.onObjectAttached(obj);
+    spawner?.respawnOne();
   }
 
   void reset() {

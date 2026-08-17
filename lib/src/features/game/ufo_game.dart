@@ -8,8 +8,8 @@ import 'package:flame_forge2d/forge2d_world.dart';
 import 'package:flame_noise/flame_noise.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:unstable_flying_object/src/features/game/entities/attachable_object_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ground_component.dart';
+import 'package:unstable_flying_object/src/features/game/entities/spawner_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ufo_component.dart';
 import 'package:unstable_flying_object/src/features/game/game_session.dart';
 import 'package:unstable_flying_object/src/features/game/hud/game_over_overlay_component.dart';
@@ -137,6 +137,8 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
 }
 
 class UfoWorld extends Forge2DWorld {
+  static const double kWorldWidth = 256;
+
   static const double _gameOverDelaySeconds = 3.0;
   double? _gameOverTimer;
   int? _pendingScore;
@@ -152,21 +154,23 @@ class UfoWorld extends Forge2DWorld {
     removeAll(children);
     reset();
 
+    final spawner = SpawnerComponent();
+    add(spawner);
+    (findGame() as UfoGame).weldManager.spawner = spawner;
+
     add(UfoComponent(initialPosition: Vector2.zero()));
     add(
       GroundComponent(0, [
+        Vector2(-128, 25),
+        Vector2(-96, 35),
         Vector2(-64, 30),
         Vector2(-32, 35),
         Vector2(0, 25),
         Vector2(64, 30),
+        Vector2(96, 30),
+        Vector2(128, 25),
       ], Palette.color14.paint()),
     );
-    add(CrateComponent(initialPosition: Vector2(10, 25)));
-    add(CrateComponent(initialPosition: Vector2(15, 25)));
-    add(CrateComponent(initialPosition: Vector2(20, 25)));
-    add(CrateComponent(initialPosition: Vector2(25, 25)));
-    add(CrateComponent(initialPosition: Vector2(30, 25)));
-    add(CrateComponent(initialPosition: Vector2(35, 25)));
   }
 
   @override
