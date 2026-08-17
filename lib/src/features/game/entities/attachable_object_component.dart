@@ -6,6 +6,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:unstable_flying_object/src/core/audio/sound_effects.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ground_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ufo_component.dart';
+import 'package:unstable_flying_object/src/features/game/game_session.dart';
 import 'package:unstable_flying_object/src/features/game/ufo_game.dart';
 import 'package:unstable_flying_object/src/features/themes/palette.dart';
 
@@ -17,7 +18,10 @@ mixin StickyBody on BodyComponent, ContactCallbacks {
   @override
   void beginContact(Object other, Contact contact) {
     super.beginContact(other, contact);
-    if (isSticky && other is AttachableObjectComponent && !other.attached) {
+    if (isSticky &&
+        other is AttachableObjectComponent &&
+        !other.attached &&
+        (game as UfoGame).session.state == GameState.playing) {
       (game as UfoGame).weldManager.queueAttach(this, other, contact);
     }
 

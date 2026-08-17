@@ -9,7 +9,7 @@ class HudComponent extends Component with HasGameReference<UfoGame> {
   void render(Canvas canvas) {
     final scoreTextPainter = TextPainter(
       text: TextSpan(
-        text: '${game.session.score}',
+        text: 'Score: ${game.session.score}',
         style: GameFonts.style(
           color: Palette.color20.color,
           fontSize: 32,
