@@ -15,6 +15,8 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
   final BeamMarker beamMarker = BeamMarker();
   final Set<AttachableObjectComponent> beamedObjects = {};
 
+  bool beamActive = true;
+
   double _beamTime = 0;
 
   @override
@@ -64,6 +66,10 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
   @override
   void renderFixture(Canvas canvas, Fixture fixture) {
     final previous = paint;
+    if (fixture.userData == beamMarker && !beamActive) {
+      paint = previous;
+      return;
+    }
     paint = fixture.userData == beamMarker
         ? Palette.color19
               .withAlpha(((sin(_beamTime * 3) * 0.5 + 0.5) * 60 + 10).toInt())
@@ -110,25 +116,29 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
       body.angularVelocity = body.angularVelocity.sign * maxAngularVelocity;
     }
 
-    beamedObjects.removeWhere((o) => o.attached);
-    for (var obj in beamedObjects) {
-      final delta = body.worldCenter - obj.body.worldCenter;
-      if (delta.length2 < 0.01) continue;
-      final dir = delta.normalized();
-      obj.body.applyForce(
-        dir * obj.body.mass * kBeamPull,
-        point: obj.body.worldCenter,
-      );
-      obj.body.applyForce(
-        -obj.body.linearVelocity * obj.body.mass * kBeamDamping,
-        point: obj.body.worldCenter,
-      );
+    if (beamActive) {
+      beamedObjects.removeWhere((o) => o.attached);
+      for (var obj in beamedObjects) {
+        final delta = body.worldCenter - obj.body.worldCenter;
+        if (delta.length2 < 0.01) continue;
+        final dir = delta.normalized();
+        obj.body.applyForce(
+          dir * obj.body.mass * kBeamPull,
+          point: obj.body.worldCenter,
+        );
+        obj.body.applyForce(
+          -obj.body.linearVelocity * obj.body.mass * kBeamDamping,
+          point: obj.body.worldCenter,
+        );
+      }
     }
   }
 
   @override
   void beginContact(Object other, Contact contact) {
     super.beginContact(other, contact);
+
+    if (!beamActive) return;
 
     if (other is AttachableObjectComponent && other.attached) return;
 

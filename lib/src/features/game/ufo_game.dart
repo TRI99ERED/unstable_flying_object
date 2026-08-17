@@ -153,6 +153,9 @@ class UfoWorld extends Forge2DWorld {
   static const double kWorldWidth = 256;
 
   static const double _gameOverDelaySeconds = 3.0;
+
+  late UfoComponent ufo;
+
   double? _gameOverTimer;
   int? _pendingScore;
 
@@ -171,7 +174,8 @@ class UfoWorld extends Forge2DWorld {
     add(spawner);
     (findGame() as UfoGame).weldManager.spawner = spawner;
 
-    add(UfoComponent(initialPosition: Vector2.zero()));
+    ufo = UfoComponent(initialPosition: Vector2.zero());
+    add(ufo);
 
     final terrainPoints = [
       Vector2(-128, 25),

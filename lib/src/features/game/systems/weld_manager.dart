@@ -1,4 +1,5 @@
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:unstable_flying_object/src/core/audio/sound_effects.dart';
 import 'package:unstable_flying_object/src/features/game/entities/attachable_object_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/spawner_component.dart';
 import 'package:unstable_flying_object/src/features/game/game_session.dart';
@@ -43,10 +44,7 @@ class WeldManager {
     }
   }
 
-  void _attach(
-    BodyComponent host,
-    AttachableObjectComponent obj,
-  ) {
+  void _attach(BodyComponent host, AttachableObjectComponent obj) {
     if (_attached.contains(obj)) return;
 
     final hostVel = host.body.linearVelocity;
@@ -80,6 +78,8 @@ class WeldManager {
 
     spawner?.onObjectAttached(obj);
     spawner?.respawnOne();
+
+    SoundEffects.instance.playAttach();
   }
 
   void reset() {

@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:unstable_flying_object/src/core/audio/sound_effects.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ground_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ufo_component.dart';
 import 'package:unstable_flying_object/src/features/game/ufo_game.dart';
@@ -24,9 +25,11 @@ mixin StickyBody on BodyComponent, ContactCallbacks {
       if (contact.fixtureA.userData is! BeamMarker &&
           contact.fixtureB.userData is! BeamMarker) {
         final ufoGame = game as UfoGame;
+        (world as UfoWorld).ufo.beamActive = false;
         ufoGame.session.gameOver();
         ufoGame.shakeScreen();
         (world as UfoWorld).showGameOverScreen(ufoGame.session.score);
+        SoundEffects.instance.playCrash();
       }
     }
   }
