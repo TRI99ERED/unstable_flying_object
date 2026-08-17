@@ -14,6 +14,7 @@ import 'package:unstable_flying_object/src/features/game/entities/ufo_component.
 import 'package:unstable_flying_object/src/features/game/game_session.dart';
 import 'package:unstable_flying_object/src/features/game/hud/game_over_overlay_component.dart';
 import 'package:unstable_flying_object/src/features/game/systems/weld_manager.dart';
+import 'package:unstable_flying_object/src/features/game/systems/wrap_system.dart';
 import 'package:unstable_flying_object/src/features/themes/palette.dart';
 
 class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
@@ -55,7 +56,6 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
   @override
   void update(double dt) {
     super.update(dt);
-    weldManager.processPending();
 
     final ufo = world.children.whereType<UfoComponent>().firstOrNull;
     if (ufo != null) {
@@ -64,6 +64,8 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
         camera.viewfinder.position.y,
       );
     }
+
+    weldManager.processPending();
   }
 
   @override
@@ -159,18 +161,31 @@ class UfoWorld extends Forge2DWorld {
     (findGame() as UfoGame).weldManager.spawner = spawner;
 
     add(UfoComponent(initialPosition: Vector2.zero()));
-    add(
-      GroundComponent(0, [
-        Vector2(-128, 25),
-        Vector2(-96, 35),
-        Vector2(-64, 30),
-        Vector2(-32, 35),
-        Vector2(0, 25),
-        Vector2(64, 30),
-        Vector2(96, 30),
-        Vector2(128, 25),
-      ], Palette.color14.paint()),
-    );
+
+    final terrainPoints = [
+      Vector2(-128, 25),
+      Vector2(-96, 35),
+      Vector2(-64, 30),
+      Vector2(-32, 35),
+      Vector2(0, 25),
+      Vector2(64, 30),
+      Vector2(96, 30),
+      Vector2(128, 25),
+    ];
+    final terrainPaint = Palette.color14.paint();
+    add(GroundComponent(0, terrainPoints, terrainPaint));
+    add(GroundComponent(
+      0,
+      terrainPoints.map((p) => Vector2(p.x - kWorldWidth, p.y)).toList(),
+      terrainPaint,
+    ));
+    add(GroundComponent(
+      0,
+      terrainPoints.map((p) => Vector2(p.x + kWorldWidth, p.y)).toList(),
+      terrainPaint,
+    ));
+
+    add(WrapSystem());
   }
 
   @override
