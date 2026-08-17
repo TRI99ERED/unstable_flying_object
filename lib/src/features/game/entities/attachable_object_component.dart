@@ -31,6 +31,7 @@ mixin StickyBody on BodyComponent, ContactCallbacks {
         final ufoGame = game as UfoGame;
         (world as UfoWorld).ufo.beamActive = false;
         ufoGame.session.gameOver();
+        ufoGame.weldManager.destroyAllJoints();
         ufoGame.shakeScreen();
         (world as UfoWorld).showGameOverScreen(ufoGame.session.score);
         SoundEffects.instance.playCrash();

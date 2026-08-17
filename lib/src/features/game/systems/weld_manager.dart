@@ -10,6 +10,7 @@ class WeldManager {
 
   final Set<AttachableObjectComponent> _attached = {};
   final List<_PendingAttach> _pending = [];
+  final List<Joint> _joints = [];
 
   SpawnerComponent? spawner;
 
@@ -66,7 +67,9 @@ class WeldManager {
     final def = WeldJointDef<Body, Body>()
       ..initialize(host.body, obj.body, anchor)
       ..collideConnected = false;
-    world.createJoint(WeldJoint(def));
+    final joint = WeldJoint(def);
+    world.createJoint(joint);
+    _joints.add(joint);
 
     host.body.linearVelocity *= 0.8;
     host.body.angularVelocity *= 0.5;
@@ -82,8 +85,18 @@ class WeldManager {
     SoundEffects.instance.playAttach();
   }
 
+  void destroyAllJoints() {
+    for (final joint in _joints) {
+      world.destroyJoint(joint);
+    }
+    _joints.clear();
+    _pending.clear();
+  }
+
   void reset() {
     _attached.clear();
+    _joints.clear();
+    _pending.clear();
   }
 }
 
