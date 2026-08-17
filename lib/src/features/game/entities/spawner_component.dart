@@ -5,7 +5,7 @@ import 'package:unstable_flying_object/src/features/game/entities/attachable_obj
 import 'package:unstable_flying_object/src/features/game/ufo_game.dart';
 
 class SpawnerComponent extends Component with HasGameReference<UfoGame> {
-  static const double kSpawnMargin = 60;
+  static const double kSpawnMargin = 0;
   static const double kGroundY = 25;
   static const int kSpawnCount = 20;
 

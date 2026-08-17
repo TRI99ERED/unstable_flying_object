@@ -174,16 +174,20 @@ class UfoWorld extends Forge2DWorld {
     ];
     final terrainPaint = Palette.color14.paint();
     add(GroundComponent(0, terrainPoints, terrainPaint));
-    add(GroundComponent(
-      0,
-      terrainPoints.map((p) => Vector2(p.x - kWorldWidth, p.y)).toList(),
-      terrainPaint,
-    ));
-    add(GroundComponent(
-      0,
-      terrainPoints.map((p) => Vector2(p.x + kWorldWidth, p.y)).toList(),
-      terrainPaint,
-    ));
+    add(
+      GroundComponent(
+        0,
+        terrainPoints.map((p) => Vector2(p.x - kWorldWidth, p.y)).toList(),
+        terrainPaint,
+      ),
+    );
+    add(
+      GroundComponent(
+        0,
+        terrainPoints.map((p) => Vector2(p.x + kWorldWidth, p.y)).toList(),
+        terrainPaint,
+      ),
+    );
 
     add(WrapSystem());
   }
