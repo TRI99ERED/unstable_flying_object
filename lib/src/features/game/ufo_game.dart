@@ -8,6 +8,7 @@ import 'package:flame_forge2d/forge2d_world.dart';
 import 'package:flame_noise/flame_noise.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:unstable_flying_object/src/core/audio/sound_effects.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ground_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/spawner_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ufo_component.dart';
@@ -27,6 +28,7 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
   final Set<LogicalKeyboardKey> _heldKeys = {};
 
   double _rollIntent = 0;
+  bool _ufoSoundPlaying = false;
 
   double get rollIntent => _rollIntent;
 
@@ -124,6 +126,15 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
         : _heldKeys.contains(LogicalKeyboardKey.keyE)
         ? 1
         : 0;
+
+    final bool shouldBePlaying = moveIntent.length2 > 0 || _rollIntent != 0;
+    if (shouldBePlaying && !_ufoSoundPlaying) {
+      SoundEffects.instance.playUfoFloating();
+      _ufoSoundPlaying = true;
+    } else if (!shouldBePlaying && _ufoSoundPlaying) {
+      SoundEffects.instance.stopUfoFloating();
+      _ufoSoundPlaying = false;
+    }
 
     return KeyEventResult.handled;
   }

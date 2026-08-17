@@ -29,11 +29,7 @@ class WeldManager {
     if (_pending.any((p) => p.obj == obj)) return;
     if (contact.fixtureA.isSensor || contact.fixtureB.isSensor) return;
 
-    final manifold = WorldManifold();
-    contact.getWorldManifold(manifold);
-    if (manifold.points.isEmpty) return;
-
-    _pending.add(_PendingAttach(host, obj, manifold.points.first.clone()));
+    _pending.add(_PendingAttach(host, obj));
   }
 
   void processPending() {
@@ -43,14 +39,13 @@ class WeldManager {
     _pending.clear();
     for (final attach in pending) {
       if (attach.obj.attached) continue;
-      _attach(attach.host, attach.obj, attach.anchor);
+      _attach(attach.host, attach.obj);
     }
   }
 
   void _attach(
     BodyComponent host,
     AttachableObjectComponent obj,
-    Vector2 anchor,
   ) {
     if (_attached.contains(obj)) return;
 
@@ -69,10 +64,14 @@ class WeldManager {
       fixture.filterData = filter;
     }
 
+    final anchor = obj.body.worldCenter.clone();
     final def = WeldJointDef<Body, Body>()
       ..initialize(host.body, obj.body, anchor)
       ..collideConnected = false;
     world.createJoint(WeldJoint(def));
+
+    host.body.linearVelocity *= 0.8;
+    host.body.angularVelocity *= 0.5;
 
     _attached.add(obj);
     obj.attached = true;
@@ -91,7 +90,6 @@ class WeldManager {
 class _PendingAttach {
   final BodyComponent host;
   final AttachableObjectComponent obj;
-  final Vector2 anchor;
 
-  _PendingAttach(this.host, this.obj, this.anchor);
+  _PendingAttach(this.host, this.obj);
 }

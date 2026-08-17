@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
 import 'package:unstable_flying_object/src/features/game/entities/attachable_object_component.dart';
@@ -12,6 +14,8 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
 
   final BeamMarker beamMarker = BeamMarker();
   final Set<AttachableObjectComponent> beamedObjects = {};
+
+  double _beamTime = 0;
 
   @override
   bool get isSticky => true;
@@ -61,7 +65,9 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
   void renderFixture(Canvas canvas, Fixture fixture) {
     final previous = paint;
     paint = fixture.userData == beamMarker
-        ? Palette.color19.withAlpha(32).paint()
+        ? Palette.color19
+              .withAlpha(((sin(_beamTime * 3) * 0.5 + 0.5) * 60 + 10).toInt())
+              .paint()
         : Palette.color23.paint();
     super.renderFixture(canvas, fixture);
     paint = previous;
@@ -70,6 +76,8 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
   @override
   void update(double dt) {
     super.update(dt);
+
+    _beamTime += dt;
 
     final gameRef = game as UfoGame;
     final attached = gameRef.weldManager.attached;
@@ -96,6 +104,11 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
     final rotatedIntent = Rot.mulVec2(body.transform.q, gameRef.moveIntent);
     body.applyForce(rotatedIntent * 100 * moveScale, point: com);
     body.applyTorque(gameRef.rollIntent * 10 * rollScale);
+
+    const maxAngularVelocity = 5.0;
+    if (body.angularVelocity.abs() > maxAngularVelocity) {
+      body.angularVelocity = body.angularVelocity.sign * maxAngularVelocity;
+    }
 
     beamedObjects.removeWhere((o) => o.attached);
     for (var obj in beamedObjects) {
