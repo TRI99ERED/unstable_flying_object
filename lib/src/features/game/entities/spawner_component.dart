@@ -1,11 +1,12 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:unstable_flying_object/src/features/game/entities/attachable_object_component.dart';
 import 'package:unstable_flying_object/src/features/game/ufo_game.dart';
 
 class SpawnerComponent extends Component with HasGameReference<UfoGame> {
-  static const double kSpawnMargin = 0;
+  static const double kSpawnMargin = 6;
   static const double kGroundY = 25;
   static const int kSpawnCount = 20;
 
@@ -48,7 +49,15 @@ class SpawnerComponent extends Component with HasGameReference<UfoGame> {
   }
 
   void spawnAt(double x, {double y = kGroundY}) {
-    final obj = CrateComponent(initialPosition: Vector2(x, y));
+    final builders = <AttachableObjectComponent Function(Vector2)>[
+      (initialPosition) => CrateComponent(initialPosition: initialPosition),
+      (initialPosition) => CarComponent(initialPosition: initialPosition),
+      (initialPosition) => ConeComponent(initialPosition: initialPosition),
+    ];
+    final random = Random();
+    final index = random.nextInt(builders.length);
+
+    final obj = builders[index](Vector2(x, y));
     game.world.add(obj);
     spawned.add(obj);
   }
