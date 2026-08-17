@@ -3,8 +3,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
-import 'package:flame_forge2d/forge2d_game.dart';
-import 'package:flame_forge2d/forge2d_world.dart';
+import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame_noise/flame_noise.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -214,7 +213,11 @@ class UfoWorld extends Forge2DWorld {
       _gameOverTimer = _gameOverTimer! - dt;
       if (_gameOverTimer! <= 0) {
         _gameOverTimer = null;
-        removeAll(children);
+        children.whereType<WrapSystem>().forEach((c) => c.removeFromParent());
+        children.whereType<SpawnerComponent>().forEach((c) => c.removeFromParent());
+        for (final body in children.whereType<BodyComponent>()) {
+          body.body.setType(BodyType.static);
+        }
         (findGame() as UfoGame).camera.viewport.add(
           GameOverOverlayComponent(score: _pendingScore!),
         );
@@ -224,7 +227,7 @@ class UfoWorld extends Forge2DWorld {
 
   void showGameOverScreen(int score) {
     _pendingScore = score;
-    _gameOverTimer = _gameOverDelaySeconds;
+    _gameOverTimer ??= _gameOverDelaySeconds;
   }
 
   void reset() {

@@ -16,7 +16,7 @@ class WeldManager {
   Set<AttachableObjectComponent> get attached => _attached;
   double get controlScale {
     final totalMass = _attached.fold(0.0, (sum, obj) => sum + obj.body.mass);
-    return 1 / (1 + 0.18 * totalMass);
+    return 1 / (1 + 0.1 * totalMass);
   }
 
   WeldManager(this.world, this.session);
