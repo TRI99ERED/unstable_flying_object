@@ -43,6 +43,7 @@ class AttachableObjectComponent extends BodyComponent
 
   @override
   bool get isSticky => attached;
+  int get score => 0;
 
   AttachableObjectComponent({required this.initialPosition}) {
     priority = 0;
@@ -60,6 +61,9 @@ class AttachableObjectComponent extends BodyComponent
 class CrateComponent extends AttachableObjectComponent {
   late final PolygonShape polygon;
   late final _CrateVisual _visual;
+
+  @override
+  int get score => 200;
 
   CrateComponent({required super.initialPosition}) {
     renderBody = false;
@@ -103,6 +107,9 @@ class _CrateVisual extends PositionComponent with HasPaint {
 class CarComponent extends AttachableObjectComponent {
   late final PolygonShape polygon;
   late final _CarVisual _visual;
+
+  @override
+  int get score => 500;
 
   CarComponent({required super.initialPosition}) {
     renderBody = false;
@@ -154,6 +161,9 @@ class _CarVisual extends PositionComponent with HasPaint {
 class ConeComponent extends AttachableObjectComponent {
   late final PolygonShape polygon;
   late final _ConeVisual _visual;
+
+  @override
+  int get score => 100;
 
   ConeComponent({required super.initialPosition}) {
     renderBody = false;

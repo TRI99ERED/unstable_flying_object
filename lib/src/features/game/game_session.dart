@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:unstable_flying_object/src/core/audio/sound_effects.dart';
-import 'package:unstable_flying_object/src/core/utils/logger.dart';
 
 enum GameState { menu, playing, gameOver }
 
@@ -19,14 +18,12 @@ class GameSession extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addScore() {
-    ++_score;
+  void addScore(int score) {
+    _score += score;
     if (_score > _bestScore) {
       _bestScore = _score;
     }
     notifyListeners();
-
-    Logger.d(score.toString(), 'GameSession');
   }
 
   void gameOver() {
@@ -36,7 +33,5 @@ class GameSession extends ChangeNotifier {
     notifyListeners();
 
     SoundEffects.instance.stopUfoFloating();
-
-    Logger.d('Game over!', 'GameSession');
   }
 }

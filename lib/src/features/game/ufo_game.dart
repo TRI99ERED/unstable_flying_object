@@ -13,6 +13,8 @@ import 'package:unstable_flying_object/src/features/game/entities/spawner_compon
 import 'package:unstable_flying_object/src/features/game/entities/ufo_component.dart';
 import 'package:unstable_flying_object/src/features/game/game_session.dart';
 import 'package:unstable_flying_object/src/features/game/hud/game_over_overlay_component.dart';
+import 'package:unstable_flying_object/src/features/game/hud/hud_component.dart';
+import 'package:unstable_flying_object/src/features/game/scenes/title_scene.dart';
 import 'package:unstable_flying_object/src/features/game/systems/weld_manager.dart';
 import 'package:unstable_flying_object/src/features/game/systems/wrap_system.dart';
 import 'package:unstable_flying_object/src/features/themes/palette.dart';
@@ -75,6 +77,17 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
     Set<LogicalKeyboardKey> keysPressed,
   ) {
     super.onKeyEvent(event, keysPressed);
+
+    if (session.state == GameState.menu) {
+      if (keysPressed.contains(LogicalKeyboardKey.enter)) {
+        world.spawnLevel();
+        session.start();
+        camera.viewport.children.whereType<TitleScene>().forEach(
+          (overlay) => overlay.removeFromParent(),
+        );
+        camera.viewport.add(HudComponent());
+      }
+    }
 
     if (session.state == GameState.gameOver) {
       _heldKeys.clear();
@@ -158,11 +171,14 @@ class UfoWorld extends Forge2DWorld {
   double? _gameOverTimer;
   int? _pendingScore;
 
+  bool get isOnTitleScene =>
+      children.any((component) => component is TitleScene);
+
   @override
   FutureOr<void> onLoad() async {
     await super.onLoad();
 
-    spawnLevel();
+    (findGame() as UfoGame).camera.viewport.add(TitleScene());
   }
 
   void spawnLevel() {
@@ -214,7 +230,9 @@ class UfoWorld extends Forge2DWorld {
       if (_gameOverTimer! <= 0) {
         _gameOverTimer = null;
         children.whereType<WrapSystem>().forEach((c) => c.removeFromParent());
-        children.whereType<SpawnerComponent>().forEach((c) => c.removeFromParent());
+        children.whereType<SpawnerComponent>().forEach(
+          (c) => c.removeFromParent(),
+        );
         for (final body in children.whereType<BodyComponent>()) {
           body.body.setType(BodyType.static);
         }

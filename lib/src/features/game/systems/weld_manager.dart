@@ -73,7 +73,7 @@ class WeldManager {
 
     _attached.add(obj);
     obj.attached = true;
-    session.addScore();
+    session.addScore(obj.score);
     obj.pop();
 
     spawner?.onObjectAttached(obj);

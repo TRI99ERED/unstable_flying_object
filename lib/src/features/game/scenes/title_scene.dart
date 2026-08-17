@@ -1,0 +1,80 @@
+import 'package:flame/components.dart';
+import 'package:flutter/material.dart';
+import 'package:unstable_flying_object/src/features/game/ufo_game.dart';
+import 'package:unstable_flying_object/src/features/themes/game_fonts.dart';
+import 'package:unstable_flying_object/src/features/themes/palette.dart';
+
+class TitleScene extends Component {
+  TitleScene();
+
+  @override
+  void render(Canvas canvas) {
+    final overlayRect = Rect.fromLTWH(
+      0,
+      0,
+      UfoGame.kGameWidth,
+      UfoGame.kGameHeight,
+    );
+    final overlayPaint = Palette.color27.paint();
+    canvas.drawRect(overlayRect, overlayPaint);
+
+    final centerX = UfoGame.kGameWidth / 2;
+    final centerY = UfoGame.kGameHeight / 2;
+
+    final titlePainter = TextPainter(
+      text: TextSpan(
+        text: 'U',
+        style: GameFonts.style(
+          color: Palette.color29.color,
+          fontSize: 64,
+          fontWeight: FontWeight.w900,
+        ),
+        children: [
+          TextSpan(
+            text: 'nstable\n',
+            style: TextStyle(color: Palette.color20.color),
+          ),
+          TextSpan(text: 'F'),
+          TextSpan(
+            text: 'lying\n',
+            style: TextStyle(color: Palette.color20.color),
+          ),
+          TextSpan(text: 'O'),
+          TextSpan(
+            text: 'bject',
+            style: TextStyle(color: Palette.color20.color),
+          ),
+        ],
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    titlePainter.layout();
+    titlePainter.paint(
+      canvas,
+      Offset(
+        centerX - titlePainter.width / 2,
+        centerY - titlePainter.height / 2,
+      ),
+    );
+
+    final hintPainter = TextPainter(
+      text: TextSpan(
+        text: 'Press [Enter] to start',
+        style: GameFonts.style(
+          color: Palette.color20.color,
+          fontSize: 24,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    hintPainter.layout();
+    hintPainter.paint(
+      canvas,
+      Offset(
+        centerX - hintPainter.width / 2,
+        centerY + UfoGame.kGameHeight / 2 - 64,
+      ),
+    );
+  }
+}
