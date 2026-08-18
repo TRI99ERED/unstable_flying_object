@@ -17,7 +17,13 @@ class GameSession extends ChangeNotifier {
     notifyListeners();
   }
 
-  void start() {
+  void menu() {
+    _score = 0;
+    _state = GameState.menu;
+    notifyListeners();
+  }
+
+  void play() {
     _score = 0;
     _state = GameState.playing;
     notifyListeners();

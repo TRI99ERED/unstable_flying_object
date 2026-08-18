@@ -122,7 +122,7 @@ class CarComponent extends AttachableObjectComponent {
   late final _CarVisual _visual;
 
   @override
-  int get score => 500;
+  int get score => 300;
 
   CarComponent({required super.initialPosition}) {
     renderBody = false;

@@ -54,12 +54,6 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
       );
 
   @override
-  Future<void> onLoad() async {
-    await super.onLoad();
-    camera.viewfinder.zoom = 10;
-  }
-
-  @override
   void update(double dt) {
     super.update(dt);
 
@@ -85,7 +79,7 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
       if (keysPressed.contains(LogicalKeyboardKey.enter)) {
         world.spawnLevel();
         session.loadBestScore(world.progressRepository.bestScore);
-        session.start();
+        session.play();
         camera.viewport.children.whereType<TitleScene>().forEach(
           (overlay) => overlay.removeFromParent(),
         );
@@ -104,11 +98,25 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
         weldManager.reset();
         world.spawnLevel();
         session.loadBestScore(world.progressRepository.bestScore);
-        session.start();
+        session.play();
+        return KeyEventResult.handled;
+      } else if (keysPressed.contains(LogicalKeyboardKey.escape)) {
+        weldManager.reset();
+        world.reset();
+        session.menu();
+        camera.viewport.add(TitleScene());
         return KeyEventResult.handled;
       }
 
       return KeyEventResult.ignored;
+    }
+
+    if (keysPressed.contains(LogicalKeyboardKey.escape)) {
+      weldManager.reset();
+      world.reset();
+      session.menu();
+      camera.viewport.add(TitleScene());
+      return KeyEventResult.handled;
     }
 
     if (event is KeyDownEvent) {
@@ -193,7 +201,6 @@ class UfoWorld extends Forge2DWorld {
   }
 
   void spawnLevel() {
-    removeAll(children);
     reset();
 
     final spawner = SpawnerComponent();
@@ -264,6 +271,7 @@ class UfoWorld extends Forge2DWorld {
   }
 
   void reset() {
+    removeAll(children);
     _gameOverTimer = null;
     _pendingScore = null;
     _pendingBestScore = null;
