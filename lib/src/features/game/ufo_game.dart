@@ -8,6 +8,9 @@ import 'package:flame_noise/flame_noise.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:unstable_flying_object/src/core/audio/sound_effects.dart';
+import 'package:unstable_flying_object/src/features/data/repositories/progress/iprogress_repository.dart';
+import 'package:unstable_flying_object/src/features/data/repositories/progress/progress_repository_impl.dart';
+import 'package:unstable_flying_object/src/features/data/repositories/shared_preferences/shared_preferences_repository_impl.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ground_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/spawner_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ufo_component.dart';
@@ -81,6 +84,7 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
     if (session.state == GameState.menu) {
       if (keysPressed.contains(LogicalKeyboardKey.enter)) {
         world.spawnLevel();
+        session.loadBestScore(world.progressRepository.bestScore);
         session.start();
         camera.viewport.children.whereType<TitleScene>().forEach(
           (overlay) => overlay.removeFromParent(),
@@ -99,6 +103,7 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
       if (keysPressed.contains(LogicalKeyboardKey.keyR)) {
         weldManager.reset();
         world.spawnLevel();
+        session.loadBestScore(world.progressRepository.bestScore);
         session.start();
         return KeyEventResult.handled;
       }
@@ -166,10 +171,15 @@ class UfoWorld extends Forge2DWorld {
 
   static const double _gameOverDelaySeconds = 3.0;
 
+  final IProgressRepository progressRepository = ProgressRepositoryImpl(
+    spRepository: SharedPreferencesRepositoryImpl(),
+  );
+
   late UfoComponent ufo;
 
   double? _gameOverTimer;
   int? _pendingScore;
+  int? _pendingBestScore;
 
   bool get isOnTitleScene =>
       children.any((component) => component is TitleScene);
@@ -179,6 +189,7 @@ class UfoWorld extends Forge2DWorld {
     await super.onLoad();
 
     (findGame() as UfoGame).camera.viewport.add(TitleScene());
+    await progressRepository.load();
   }
 
   void spawnLevel() {
@@ -237,20 +248,25 @@ class UfoWorld extends Forge2DWorld {
           body.body.setType(BodyType.static);
         }
         (findGame() as UfoGame).camera.viewport.add(
-          GameOverOverlayComponent(score: _pendingScore!),
+          GameOverOverlayComponent(
+            score: _pendingScore!,
+            bestScore: _pendingBestScore!,
+          ),
         );
       }
     }
   }
 
-  void showGameOverScreen(int score) {
+  void showGameOverScreen(int score, int bestScore) {
     _pendingScore = score;
+    _pendingBestScore = bestScore;
     _gameOverTimer ??= _gameOverDelaySeconds;
   }
 
   void reset() {
     _gameOverTimer = null;
     _pendingScore = null;
+    _pendingBestScore = null;
     (findGame() as UfoGame).camera.viewport.children
         .whereType<GameOverOverlayComponent>()
         .forEach((overlay) => overlay.removeFromParent());

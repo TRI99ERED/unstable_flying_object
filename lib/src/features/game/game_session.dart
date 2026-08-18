@@ -12,6 +12,11 @@ class GameSession extends ChangeNotifier {
   int get score => _score;
   int get bestScore => _bestScore;
 
+  void loadBestScore(int bestScore) {
+    _bestScore = bestScore;
+    notifyListeners();
+  }
+
   void start() {
     _score = 0;
     _state = GameState.playing;

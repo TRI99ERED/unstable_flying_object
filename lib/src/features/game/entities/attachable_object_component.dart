@@ -31,9 +31,17 @@ mixin StickyBody on BodyComponent, ContactCallbacks {
         final ufoGame = game as UfoGame;
         (world as UfoWorld).ufo.beamActive = false;
         ufoGame.session.gameOver();
+        if (ufoGame.session.score >= ufoGame.session.bestScore) {
+          (world as UfoWorld).progressRepository.save(
+            ufoGame.session.bestScore,
+          );
+        }
         ufoGame.weldManager.destroyAllJoints();
         ufoGame.shakeScreen();
-        (world as UfoWorld).showGameOverScreen(ufoGame.session.score);
+        (world as UfoWorld).showGameOverScreen(
+          ufoGame.session.score,
+          ufoGame.session.bestScore,
+        );
         SoundEffects.instance.playCrash();
       }
     }

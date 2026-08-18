@@ -3,6 +3,7 @@ import 'package:unstable_flying_object/src/core/audio/sound_effects.dart';
 import 'package:unstable_flying_object/src/features/game/entities/attachable_object_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/spawner_component.dart';
 import 'package:unstable_flying_object/src/features/game/game_session.dart';
+import 'package:unstable_flying_object/src/features/game/ufo_game.dart';
 
 class WeldManager {
   final Forge2DWorld world;
@@ -17,7 +18,7 @@ class WeldManager {
   Set<AttachableObjectComponent> get attached => _attached;
   double get controlScale {
     final totalMass = _attached.fold(0.0, (sum, obj) => sum + obj.body.mass);
-    return 1 / (1 + 0.1 * totalMass);
+    return 1 / (1 + 0.01 * totalMass);
   }
 
   WeldManager(this.world, this.session);
@@ -77,6 +78,7 @@ class WeldManager {
     _attached.add(obj);
     obj.attached = true;
     session.addScore(obj.score);
+    (world as UfoWorld).progressRepository.save(session.bestScore);
     obj.pop();
 
     spawner?.onObjectAttached(obj);

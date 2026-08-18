@@ -8,8 +8,9 @@ import 'package:unstable_flying_object/src/features/themes/palette.dart';
 
 class GameOverOverlayComponent extends Component {
   final int score;
+  final int bestScore;
 
-  GameOverOverlayComponent({required this.score});
+  GameOverOverlayComponent({required this.score, required this.bestScore});
 
   static const double _cycleDuration = 1.0;
 
@@ -85,6 +86,30 @@ class GameOverOverlayComponent extends Component {
       ),
     );
 
+    final bestScorePainter = TextPainter(
+      text: TextSpan(
+        text: 'Best: $bestScore',
+        style: GameFonts.style(
+          color: Palette.color20.color,
+          fontSize: 32,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    bestScorePainter.layout();
+    bestScorePainter.paint(
+      canvas,
+      Offset(
+        centerX - bestScorePainter.width / 2,
+        centerY +
+            messagePainter.height / 2 +
+            scorePainter.height +
+            bestScorePainter.height +
+            8,
+      ),
+    );
+
     final retryPainter = TextPainter(
       text: TextSpan(
         text: 'Press [R] to Retry',
@@ -104,8 +129,9 @@ class GameOverOverlayComponent extends Component {
         centerY +
             messagePainter.height / 2 +
             scorePainter.height +
+            bestScorePainter.height +
             retryPainter.height +
-            8,
+            16,
       ),
     );
   }

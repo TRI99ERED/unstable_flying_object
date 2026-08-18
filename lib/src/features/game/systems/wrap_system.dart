@@ -6,19 +6,19 @@ import 'package:unstable_flying_object/src/features/game/ufo_game.dart';
 class WrapSystem extends Component with HasGameReference<UfoGame> {
   @override
   void update(double dt) {
-    final gameRef = game;
-    final world = gameRef.world;
+    final ufoGame = game;
+    final world = ufoGame.world;
     final halfWidth = UfoWorld.kWorldWidth / 2;
 
-    _wrapAssembly(gameRef, world, halfWidth);
-    _wrapUnattached(gameRef, world, halfWidth);
+    _wrapAssembly(ufoGame, world, halfWidth);
+    _wrapUnattached(ufoGame, world, halfWidth);
   }
 
-  void _wrapAssembly(UfoGame gameRef, UfoWorld world, double halfWidth) {
+  void _wrapAssembly(UfoGame ufoGame, UfoWorld world, double halfWidth) {
     final ufo = world.children.whereType<UfoComponent>().firstOrNull;
     if (ufo == null) return;
 
-    final attached = gameRef.weldManager.attached;
+    final attached = ufoGame.weldManager.attached;
     final beamed = ufo.beamedObjects;
 
     final bodies = <Body>[ufo.body];
@@ -50,14 +50,14 @@ class WrapSystem extends Component with HasGameReference<UfoGame> {
     }
   }
 
-  void _wrapUnattached(UfoGame gameRef, UfoWorld world, double halfWidth) {
-    final spawner = gameRef.weldManager.spawner;
+  void _wrapUnattached(UfoGame ufoGame, UfoWorld world, double halfWidth) {
+    final spawner = ufoGame.weldManager.spawner;
     if (spawner == null) return;
 
     final ufo = world.children.whereType<UfoComponent>().firstOrNull;
     final cameraX = ufo != null
         ? ufo.body.position.x
-        : gameRef.camera.viewfinder.position.x;
+        : ufoGame.camera.viewfinder.position.x;
 
     for (final obj in spawner.spawned) {
       if (obj.attached) continue;

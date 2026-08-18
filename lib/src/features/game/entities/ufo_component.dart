@@ -86,17 +86,23 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
 
     _beamTime += dt;
 
-    final gameRef = game as UfoGame;
+    final ufoGame = game as UfoGame;
 
     if (body.position.y < -UfoGame.kGameHeight / 10 / 2 - 1 && beamActive) {
       beamActive = false;
-      gameRef.session.gameOver();
-      (world as UfoWorld).showGameOverScreen(gameRef.session.score);
+      ufoGame.session.gameOver();
+      if (ufoGame.session.score >= ufoGame.session.bestScore) {
+        (world as UfoWorld).progressRepository.save(ufoGame.session.bestScore);
+      }
+      (world as UfoWorld).showGameOverScreen(
+        ufoGame.session.score,
+        ufoGame.session.bestScore,
+      );
       body.setType(BodyType.static);
       SoundEffects.instance.playUfoLeave();
     }
 
-    final attached = gameRef.weldManager.attached;
+    final attached = ufoGame.weldManager.attached;
 
     var totalMass = body.mass;
     var weightedCenter = body.worldCenter * totalMass;
@@ -113,13 +119,13 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
       inertiaAboutCom += obj.body.inertia + obj.body.mass * offset.length2;
     }
 
-    final moveScale = totalMass / body.mass * gameRef.weldManager.controlScale;
+    final moveScale = totalMass / body.mass * ufoGame.weldManager.controlScale;
     final rollScale =
-        inertiaAboutCom / body.inertia * gameRef.weldManager.controlScale;
+        inertiaAboutCom / body.inertia * ufoGame.weldManager.controlScale;
 
-    final rotatedIntent = Rot.mulVec2(body.transform.q, gameRef.moveIntent);
+    final rotatedIntent = Rot.mulVec2(body.transform.q, ufoGame.moveIntent);
     body.applyForce(rotatedIntent * 100 * moveScale, point: com);
-    body.applyTorque(gameRef.rollIntent * 10 * rollScale);
+    body.applyTorque(ufoGame.rollIntent * 10 * rollScale);
 
     const maxAngularVelocity = 5.0;
     if (body.angularVelocity.abs() > maxAngularVelocity) {
