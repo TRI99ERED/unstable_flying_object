@@ -30,6 +30,10 @@ class SoundEffects {
     if (pool != null) unawaited(pool.start(volume: _volume));
   }
 
+  void playUfoLeave() {
+    unawaited(FlameAudio.play('ufo_leave.mp3', volume: _volume));
+  }
+
   Future<void> playUfoFloating() async {
     ufoFloatingPlayer = await FlameAudio.loop(
       'ufo_floating.mp3',

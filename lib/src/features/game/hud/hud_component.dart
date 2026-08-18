@@ -20,5 +20,25 @@ class HudComponent extends Component with HasGameReference<UfoGame> {
     );
     scoreTextPainter.layout();
     scoreTextPainter.paint(canvas, Offset(16, 16));
+
+    final hintTextPainter = TextPainter(
+      text: TextSpan(
+        text: '[←↑↓→] or [WASD] to move. [Q] and [E] to rotate.',
+        style: GameFonts.style(
+          color: Palette.color20.color,
+          fontSize: 32,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    hintTextPainter.layout();
+    hintTextPainter.paint(
+      canvas,
+      Offset(
+        UfoGame.kGameWidth / 2 - hintTextPainter.width / 2,
+        UfoGame.kGameHeight - hintTextPainter.height,
+      ),
+    );
   }
 }

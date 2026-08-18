@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
+import 'package:unstable_flying_object/src/core/audio/sound_effects.dart';
 import 'package:unstable_flying_object/src/features/game/entities/attachable_object_component.dart';
 import 'package:unstable_flying_object/src/features/game/ufo_game.dart';
 import 'package:unstable_flying_object/src/features/themes/palette.dart';
@@ -87,11 +88,12 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
 
     final gameRef = game as UfoGame;
 
-    if (body.position.y < -UfoGame.kGameHeight / 10 / 2) {
+    if (body.position.y < -UfoGame.kGameHeight / 10 / 2 - 1 && beamActive) {
       beamActive = false;
       gameRef.session.gameOver();
       (world as UfoWorld).showGameOverScreen(gameRef.session.score);
       body.setType(BodyType.static);
+      SoundEffects.instance.playUfoLeave();
     }
 
     final attached = gameRef.weldManager.attached;
