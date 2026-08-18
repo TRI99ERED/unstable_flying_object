@@ -15,19 +15,35 @@ class SoundEffects {
   AudioPool? _crashPool;
   AudioPlayer? ufoFloatingPlayer;
 
+  final List<Future<void> Function()> _activeStopFunctions = [];
+
   Future<void> init() async {
     _attachPool = await FlameAudio.createPool('attach.wav', maxPlayers: 4);
     _crashPool = await FlameAudio.createPool('crash.wav', maxPlayers: 4);
   }
 
-  void playAttach() {
-    final pool = _attachPool;
-    if (pool != null) unawaited(pool.start(volume: _volume));
+  void stopGameplayAudio() {
+    for (final stopFn in _activeStopFunctions) {
+      stopFn();
+    }
+    _activeStopFunctions.clear();
+    stopUfoFloating();
   }
 
-  void playCrash() {
+  void playAttach() async {
+    final pool = _attachPool;
+    if (pool != null) {
+      final stopFn = await pool.start(volume: _volume);
+      _activeStopFunctions.add(stopFn);
+    }
+  }
+
+  void playCrash() async {
     final pool = _crashPool;
-    if (pool != null) unawaited(pool.start(volume: _volume));
+    if (pool != null) {
+      final stopFn = await pool.start(volume: _volume);
+      _activeStopFunctions.add(stopFn);
+    }
   }
 
   void playUfoLeave() {

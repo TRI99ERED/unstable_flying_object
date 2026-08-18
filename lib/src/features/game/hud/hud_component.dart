@@ -40,7 +40,7 @@ class HudComponent extends Component with HasGameReference<UfoGame> {
 
     final hintTextPainter = TextPainter(
       text: TextSpan(
-        text: '[←↑↓→] or [WASD] to move. [Q] and [E] to rotate.',
+        text: '[←↑↓→] or [WASD] to move. [Q] and [E] to rotate. [Esc] to menu',
         style: GameFonts.style(
           color: Palette.color20.color,
           fontSize: 32,

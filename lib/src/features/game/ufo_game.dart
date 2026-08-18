@@ -268,6 +268,7 @@ class UfoWorld extends Forge2DWorld {
     _pendingScore = score;
     _pendingBestScore = bestScore;
     _gameOverTimer ??= _gameOverDelaySeconds;
+    SoundEffects.instance.stopGameplayAudio();
   }
 
   void reset() {
@@ -278,5 +279,6 @@ class UfoWorld extends Forge2DWorld {
     (findGame() as UfoGame).camera.viewport.children
         .whereType<GameOverOverlayComponent>()
         .forEach((overlay) => overlay.removeFromParent());
+    SoundEffects.instance.stopGameplayAudio();
   }
 }

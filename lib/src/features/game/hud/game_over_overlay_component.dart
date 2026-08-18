@@ -134,5 +134,31 @@ class GameOverOverlayComponent extends Component {
             16,
       ),
     );
+
+    final menuPainter = TextPainter(
+      text: TextSpan(
+        text: 'Press [Esc] to menu',
+        style: GameFonts.style(
+          color: Palette.color20.color,
+          fontSize: 24,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    menuPainter.layout();
+    menuPainter.paint(
+      canvas,
+      Offset(
+        centerX - menuPainter.width / 2,
+        centerY +
+            messagePainter.height / 2 +
+            scorePainter.height +
+            bestScorePainter.height +
+            retryPainter.height +
+            menuPainter.height +
+            24,
+      ),
+    );
   }
 }
