@@ -25,7 +25,7 @@ mixin StickyBody on BodyComponent, ContactCallbacks {
       (game as UfoGame).weldManager.queueAttach(this, other, contact);
     }
 
-    if (isSticky && other is GroundComponent) {
+    if (isSticky && other is GroundComponent && (game as UfoGame).session.state == GameState.playing) {
       if (contact.fixtureA.userData is! BeamMarker &&
           contact.fixtureB.userData is! BeamMarker) {
         final ufoGame = game as UfoGame;

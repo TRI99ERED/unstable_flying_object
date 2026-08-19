@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
@@ -210,17 +211,16 @@ class UfoWorld extends Forge2DWorld {
     ufo = UfoComponent(initialPosition: Vector2.zero());
     add(ufo);
 
-    final terrainPoints = [
-      Vector2(-128, 25),
-      Vector2(-96, 35),
-      Vector2(-64, 30),
-      Vector2(-32, 35),
-      Vector2(0, 25),
-      Vector2(64, 30),
-      Vector2(96, 30),
-      Vector2(128, 25),
-    ];
+    final random = Random();
+    final terrainPoints = List.generate(
+      9,
+      (int i) => Vector2(-128 + i * 32, random.nextDouble() * 5 + 25),
+      growable: false,
+    );
+    terrainPoints.last.y = terrainPoints.first.y;
+
     final terrainPaint = Palette.color14.paint();
+
     add(GroundComponent(0, terrainPoints, terrainPaint));
     add(
       GroundComponent(
