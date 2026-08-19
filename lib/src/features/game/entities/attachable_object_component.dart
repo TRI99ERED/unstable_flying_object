@@ -287,5 +287,17 @@ class _CowVisual extends PositionComponent with HasPaint {
     canvas.drawPath(path, paint);
 
     canvas.drawCircle(Offset(-1, -0.5), 0.5, paint);
+
+    final legWidth = 0.15;
+    final legHeight = 0.3;
+    canvas.drawRect(Rect.fromLTWH(-0.8, 0.5, legWidth, legHeight), paint);
+    canvas.drawRect(Rect.fromLTWH(-0.45, 0.5, legWidth, legHeight), paint);
+    canvas.drawRect(Rect.fromLTWH(0.3, 0.5, legWidth, legHeight), paint);
+    canvas.drawRect(Rect.fromLTWH(0.65, 0.5, legWidth, legHeight), paint);
+
+    final spotPaint = Paint()..color = Palette.color22.color;
+    canvas.drawOval(Rect.fromCenter(center: Offset(-0.5, -0.1), width: 0.4, height: 0.3), spotPaint);
+    canvas.drawOval(Rect.fromCenter(center: Offset(0.3, 0.15), width: 0.35, height: 0.25), spotPaint);
+    canvas.drawOval(Rect.fromCenter(center: Offset(-0.1, -0.3), width: 0.3, height: 0.2), spotPaint);
   }
 }
