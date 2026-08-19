@@ -13,6 +13,7 @@ void main() {
     () {
       WidgetsFlutterBinding.ensureInitialized();
       unawaited(SoundEffects.instance.init());
+      SoundEffects.instance.playMainTheme();
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.landscapeLeft,

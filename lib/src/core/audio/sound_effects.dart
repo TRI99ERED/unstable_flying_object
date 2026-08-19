@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flame_audio/bgm.dart';
 import 'package:flame_audio/flame_audio.dart';
 
 class SoundEffects {
@@ -11,6 +12,8 @@ class SoundEffects {
 
   static const double _volume = 0.5;
 
+  final Bgm _musicBgm = Bgm(audioCache: AudioCache(prefix: 'assets/music/'));
+
   AudioPool? _attachPool;
   AudioPool? _crashPool;
   AudioPlayer? ufoFloatingPlayer;
@@ -20,6 +23,7 @@ class SoundEffects {
   Future<void> init() async {
     _attachPool = await FlameAudio.createPool('attach.wav', maxPlayers: 4);
     _crashPool = await FlameAudio.createPool('crash.wav', maxPlayers: 4);
+    await _musicBgm.initialize();
   }
 
   void stopGameplayAudio() {
@@ -59,5 +63,9 @@ class SoundEffects {
 
   void stopUfoFloating() {
     unawaited(ufoFloatingPlayer?.stop());
+  }
+
+  void playMainTheme() {
+    unawaited(_musicBgm.play('main.wav', volume: _volume));
   }
 }
