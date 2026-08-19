@@ -13,6 +13,7 @@ import 'package:unstable_flying_object/src/features/data/repositories/progress/i
 import 'package:unstable_flying_object/src/features/data/repositories/progress/progress_repository_impl.dart';
 import 'package:unstable_flying_object/src/features/data/repositories/shared_preferences/shared_preferences_repository_impl.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ground_component.dart';
+import 'package:unstable_flying_object/src/features/game/entities/scenery_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/spawner_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ufo_component.dart';
 import 'package:unstable_flying_object/src/features/game/game_session.dart';
@@ -218,6 +219,12 @@ class UfoWorld extends Forge2DWorld {
     (findGame() as UfoGame).weldManager.spawner = spawner;
 
     final random = Random();
+
+    final seed = random.nextInt(10);
+    add(SceneryComponent(Vector2.zero(), seed: seed));
+    add(SceneryComponent(Vector2(-kWorldWidth, 0), seed: seed));
+    add(SceneryComponent(Vector2(kWorldWidth, 0), seed: seed));
+
     final terrainPoints = List.generate(
       9,
       (int i) => Vector2(-128 + i * 32, random.nextDouble() * 5 + 25),
