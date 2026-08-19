@@ -9,6 +9,7 @@ class SpawnerComponent extends Component with HasGameReference<UfoGame> {
   static const double kSpawnMargin = 6;
   static const double kGroundY = 25;
   static const int kSpawnCount = 20;
+  static const double kMinSpawnDistance = 5;
 
   final Set<AttachableObjectComponent> spawned = {};
 
@@ -48,7 +49,20 @@ class SpawnerComponent extends Component with HasGameReference<UfoGame> {
     return x;
   }
 
+  bool _isPositionClear(double x) {
+    for (final obj in spawned) {
+      if ((obj.initialPosition.x - x).abs() < kMinSpawnDistance) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   void spawnAt(double x, {double y = kGroundY}) {
+    if (!_isPositionClear(x)) {
+      return;
+    }
+
     final builders = <AttachableObjectComponent Function(Vector2)>[
       (initialPosition) => CrateComponent(initialPosition: initialPosition),
       (initialPosition) => CarComponent(initialPosition: initialPosition),
