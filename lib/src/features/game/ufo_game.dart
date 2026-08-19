@@ -69,6 +69,10 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
     }
 
     weldManager.processPending();
+
+    if (session.state == GameState.playing) {
+      session.updateCombo(dt);
+    }
   }
 
   @override

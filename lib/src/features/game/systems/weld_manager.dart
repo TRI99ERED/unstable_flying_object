@@ -78,7 +78,7 @@ class WeldManager {
 
     _attached.add(obj);
     obj.attached = true;
-    session.addScore(obj.score);
+    session.onAttach(obj.score);
     (world as UfoWorld).progressRepository.save(session.bestScore);
     obj.pop();
 
@@ -86,7 +86,7 @@ class WeldManager {
       FlyingNumberComponent(
         position: obj.body.worldCenter.clone(),
         objectName: obj.name,
-        objectScore: obj.score,
+        objectScore: obj.score * session.comboLevel,
       ),
     );
 

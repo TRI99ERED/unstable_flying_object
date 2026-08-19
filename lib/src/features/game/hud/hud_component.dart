@@ -5,6 +5,9 @@ import 'package:unstable_flying_object/src/features/themes/game_fonts.dart';
 import 'package:unstable_flying_object/src/features/themes/palette.dart';
 
 class HudComponent extends Component with HasGameReference<UfoGame> {
+  static const double _barWidth = 100;
+  static const double _barHeight = 4;
+
   @override
   void render(Canvas canvas) {
     final scoreTextPainter = TextPainter(
@@ -20,6 +23,46 @@ class HudComponent extends Component with HasGameReference<UfoGame> {
     );
     scoreTextPainter.layout();
     scoreTextPainter.paint(canvas, Offset(16, 16));
+
+    if (game.session.comboLevel >= 1) {
+      final comboTextPainter = TextPainter(
+        text: TextSpan(
+          text: 'x${game.session.comboLevel}',
+          style: GameFonts.style(
+            color: Palette.color12.color,
+            fontSize: 32,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      );
+      comboTextPainter.layout();
+      comboTextPainter.paint(canvas, const Offset(16, 56));
+
+      final barX = 16.0;
+      final barY = 92.0;
+      final fillWidth = _barWidth * game.session.comboTimerNormalized;
+
+      final bgPaint = Paint()..color = Palette.color27.color.withAlpha(128);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(barX, barY, _barWidth, _barHeight),
+          const Radius.circular(2),
+        ),
+        bgPaint,
+      );
+
+      if (fillWidth > 0) {
+        final fillPaint = Paint()..color = Palette.color12.color;
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromLTWH(barX, barY, fillWidth, _barHeight),
+            const Radius.circular(2),
+          ),
+          fillPaint,
+        );
+      }
+    }
 
     final bestScoreTextPainter = TextPainter(
       text: TextSpan(
