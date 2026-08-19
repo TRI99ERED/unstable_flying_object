@@ -175,6 +175,9 @@ class _CarVisual extends PositionComponent with HasPaint {
         true,
       );
     canvas.drawPath(path, paint);
+
+    canvas.drawCircle(Offset(-1, 0.5), 0.35, paint);
+    canvas.drawCircle(Offset(1, 0.5), 0.35, paint);
   }
 }
 

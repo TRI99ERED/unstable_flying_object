@@ -63,15 +63,24 @@ class SpawnerComponent extends Component with HasGameReference<UfoGame> {
       return;
     }
 
-    final builders = <AttachableObjectComponent Function(Vector2)>[
-      (initialPosition) => CrateComponent(initialPosition: initialPosition),
-      (initialPosition) => CarComponent(initialPosition: initialPosition),
-      (initialPosition) => ConeComponent(initialPosition: initialPosition),
+    final weighted = <(AttachableObjectComponent Function(Vector2), double)>[
+      ((p) => CrateComponent(initialPosition: p), 2.5),
+      ((p) => CarComponent(initialPosition: p), 1.5),
+      ((p) => ConeComponent(initialPosition: p), 6.0),
     ];
-    final random = Random();
-    final index = random.nextInt(builders.length);
+    final totalWeight = weighted.fold<double>(0, (sum, e) => sum + e.$2);
+    final roll = Random().nextDouble() * totalWeight;
+    var acc = 0.0;
+    AttachableObjectComponent Function(Vector2) builder = weighted[0].$1;
+    for (final (b, w) in weighted) {
+      acc += w;
+      if (roll < acc) {
+        builder = b;
+        break;
+      }
+    }
 
-    final obj = builders[index](Vector2(x, y));
+    final obj = builder(Vector2(x, y));
     game.world.add(obj);
     spawned.add(obj);
   }
