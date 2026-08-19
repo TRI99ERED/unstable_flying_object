@@ -50,7 +50,7 @@ class _HouseComponent extends PositionComponent {
       Offset(5, -5),
       Offset(10, 0),
     ], true);
-    canvas.drawPath(houseRoofPath, Palette.color6.paint());
+    canvas.drawPath(houseRoofPath, Palette.color7.paint());
 
     final houseWindowRect = Rect.fromLTWH(4, 2, 2, 2);
     canvas.drawRect(houseWindowRect, Palette.color19.paint());
