@@ -229,3 +229,63 @@ class _ConeVisual extends PositionComponent with HasPaint {
     canvas.drawPath(path, paint);
   }
 }
+
+class CowComponent extends AttachableObjectComponent {
+  late final PolygonShape polygon;
+  late final _CowVisual _visual;
+
+  @override
+  int get score => 500;
+  @override
+  String get name => 'Cow';
+
+  CowComponent({required super.initialPosition}) {
+    renderBody = false;
+    polygon = PolygonShape()
+      ..set([
+        Vector2(-1, 0),
+        Vector2(-1, -0.5),
+        Vector2(0.5, -0.5),
+        Vector2(1, 0),
+        Vector2(1, 0.5),
+        Vector2(0.5, 0.5),
+        Vector2(-0.5, 0.5),
+        Vector2(-1, 0.5),
+      ]);
+    fixtureDefs = [
+      FixtureDef(polygon)
+        ..userData = this
+        ..density = 1
+        ..friction = 0.4
+        ..restitution = 0.1,
+    ];
+    _visual = _CowVisual(polygon);
+    _visual.paint = Palette.color21.paint();
+    add(_visual);
+  }
+
+  @override
+  void pop() {
+    final controller = EffectController(duration: 0.06, reverseDuration: 0.15);
+    _visual.add(ScaleEffect.to(Vector2.all(1.5), controller));
+    _visual.add(ColorEffect(Palette.color20.color, controller));
+  }
+}
+
+class _CowVisual extends PositionComponent with HasPaint {
+  final PolygonShape polygon;
+
+  _CowVisual(this.polygon);
+
+  @override
+  void render(Canvas canvas) {
+    final path = Path()
+      ..addPolygon(
+        polygon.vertices.map((v) => v.toOffset()).toList(growable: false),
+        true,
+      );
+    canvas.drawPath(path, paint);
+
+    canvas.drawCircle(Offset(-1, -0.5), 0.5, paint);
+  }
+}
