@@ -296,8 +296,58 @@ class _CowVisual extends PositionComponent with HasPaint {
     canvas.drawRect(Rect.fromLTWH(0.65, 0.5, legWidth, legHeight), paint);
 
     final spotPaint = Paint()..color = Palette.color22.color;
-    canvas.drawOval(Rect.fromCenter(center: Offset(-0.5, -0.1), width: 0.4, height: 0.3), spotPaint);
-    canvas.drawOval(Rect.fromCenter(center: Offset(0.3, 0.15), width: 0.35, height: 0.25), spotPaint);
-    canvas.drawOval(Rect.fromCenter(center: Offset(-0.1, -0.3), width: 0.3, height: 0.2), spotPaint);
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(-0.5, -0.1), width: 0.4, height: 0.3),
+      spotPaint,
+    );
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(0.3, 0.15), width: 0.35, height: 0.25),
+      spotPaint,
+    );
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(-0.1, -0.3), width: 0.3, height: 0.2),
+      spotPaint,
+    );
+  }
+}
+
+class BarrelComponent extends AttachableObjectComponent {
+  late final _BarrelVisual _visual;
+
+  @override
+  int get score => 100;
+  @override
+  String get name => 'Barrel';
+
+  BarrelComponent({required super.initialPosition}) {
+    renderBody = false;
+    fixtureDefs = [
+      FixtureDef(CircleShape(radius: 0.5))
+        ..userData = this
+        ..density = 1
+        ..friction = 0.4
+        ..restitution = 0.1,
+    ];
+    _visual = _BarrelVisual(0.5);
+    _visual.paint = Palette.color9.paint();
+    add(_visual);
+  }
+
+  @override
+  void pop() {
+    final controller = EffectController(duration: 0.06, reverseDuration: 0.15);
+    _visual.add(ScaleEffect.to(Vector2.all(1.5), controller));
+    _visual.add(ColorEffect(Palette.color10.color, controller));
+  }
+}
+
+class _BarrelVisual extends PositionComponent with HasPaint {
+  final double radius;
+
+  _BarrelVisual(this.radius);
+
+  @override
+  void render(Canvas canvas) {
+    canvas.drawCircle(Offset.zero, radius, paint);
   }
 }

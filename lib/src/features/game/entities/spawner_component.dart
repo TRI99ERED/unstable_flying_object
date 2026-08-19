@@ -65,9 +65,10 @@ class SpawnerComponent extends Component with HasGameReference<UfoGame> {
 
     final weighted = <(AttachableObjectComponent Function(Vector2), double)>[
       ((p) => CrateComponent(initialPosition: p), 2.5),
+      ((p) => BarrelComponent(initialPosition: p), 2.5),
       ((p) => CarComponent(initialPosition: p), 1.5),
-      ((p) => ConeComponent(initialPosition: p), 5.0),
-      ((p) => CowComponent(initialPosition: p), 1.0),
+      ((p) => ConeComponent(initialPosition: p), 3.4),
+      ((p) => CowComponent(initialPosition: p), 0.1),
     ];
     final totalWeight = weighted.fold<double>(0, (sum, e) => sum + e.$2);
     final roll = Random().nextDouble() * totalWeight;
