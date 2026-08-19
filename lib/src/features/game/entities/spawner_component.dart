@@ -31,15 +31,15 @@ class SpawnerComponent extends Component with HasGameReference<UfoGame> {
 
   void respawnOne() {
     final visible = game.camera.visibleWorldRect;
-    final dir = game.moveIntent.x.sign; // idle => dir 0 => right
+    final dir = game.moveIntent.x.sign;
     final x = dir >= 0
         ? visible.right + kSpawnMargin
         : visible.left - kSpawnMargin;
-    spawnAt(_wrapX(x)); // always offscreen
+    spawnAt(_wrapX(x));
   }
 
   void onObjectAttached(AttachableObjectComponent obj) {
-    spawned.remove(obj); // fixes bug #2
+    spawned.remove(obj);
   }
 
   double _wrapX(double x) {

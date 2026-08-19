@@ -112,6 +112,26 @@ class TitleScene extends Component {
       ),
     );
 
+    final creditPainter = TextPainter(
+      text: TextSpan(
+        text: 'By TRI99ER',
+        style: GameFonts.style(
+          color: Palette.color22.color,
+          fontSize: 32,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    creditPainter.layout();
+    creditPainter.paint(
+      canvas,
+      Offset(
+        centerX - creditPainter.width / 2,
+        centerY + titlePainter.height / 2 + creditPainter.height / 2,
+      ),
+    );
+
     final hintPainter = TextPainter(
       text: TextSpan(
         text: 'Press [Enter] to start',
