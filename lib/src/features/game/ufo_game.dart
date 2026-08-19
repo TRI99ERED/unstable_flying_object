@@ -18,6 +18,7 @@ import 'package:unstable_flying_object/src/features/game/entities/ufo_component.
 import 'package:unstable_flying_object/src/features/game/game_session.dart';
 import 'package:unstable_flying_object/src/features/game/hud/game_over_overlay_component.dart';
 import 'package:unstable_flying_object/src/features/game/hud/hud_component.dart';
+import 'package:unstable_flying_object/src/features/game/hud/settling_overlay_component.dart';
 import 'package:unstable_flying_object/src/features/game/scenes/title_scene.dart';
 import 'package:unstable_flying_object/src/features/game/systems/weld_manager.dart';
 import 'package:unstable_flying_object/src/features/game/systems/wrap_system.dart';
@@ -79,13 +80,16 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
     if (session.state == GameState.menu) {
       if (keysPressed.contains(LogicalKeyboardKey.enter)) {
         world.spawnLevel();
-        session.loadBestScore(world.progressRepository.bestScore);
-        session.play();
+        session.settle();
         camera.viewport.children.whereType<TitleScene>().forEach(
           (overlay) => overlay.removeFromParent(),
         );
-        camera.viewport.add(HudComponent());
+        camera.viewport.add(SettlingOverlayComponent());
       }
+    }
+
+    if (session.state == GameState.settling) {
+      return KeyEventResult.handled;
     }
 
     if (session.state == GameState.gameOver) {
@@ -98,8 +102,11 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
       if (keysPressed.contains(LogicalKeyboardKey.keyR)) {
         weldManager.reset();
         world.spawnLevel();
-        session.loadBestScore(world.progressRepository.bestScore);
-        session.play();
+        session.settle();
+        camera.viewport.children.whereType<SettlingOverlayComponent>().forEach(
+          (overlay) => overlay.removeFromParent(),
+        );
+        camera.viewport.add(SettlingOverlayComponent());
         return KeyEventResult.handled;
       } else if (keysPressed.contains(LogicalKeyboardKey.escape)) {
         weldManager.reset();
@@ -179,6 +186,7 @@ class UfoWorld extends Forge2DWorld {
   static const double kWorldWidth = 256;
 
   static const double _gameOverDelaySeconds = 3.0;
+  static const double _settlingDuration = 0.75;
 
   final IProgressRepository progressRepository = ProgressRepositoryImpl(
     spRepository: SharedPreferencesRepositoryImpl(),
@@ -187,6 +195,7 @@ class UfoWorld extends Forge2DWorld {
   late UfoComponent ufo;
 
   double? _gameOverTimer;
+  double? _settlingTimer;
   int? _pendingScore;
   int? _pendingBestScore;
 
@@ -207,9 +216,6 @@ class UfoWorld extends Forge2DWorld {
     final spawner = SpawnerComponent();
     add(spawner);
     (findGame() as UfoGame).weldManager.spawner = spawner;
-
-    ufo = UfoComponent(initialPosition: Vector2.zero());
-    add(ufo);
 
     final random = Random();
     final terrainPoints = List.generate(
@@ -238,11 +244,35 @@ class UfoWorld extends Forge2DWorld {
     );
 
     add(WrapSystem());
+
+    _settlingTimer = _settlingDuration;
+  }
+
+  void _finishSettling() {
+    ufo = UfoComponent(initialPosition: Vector2.zero());
+    add(ufo);
+
+    (findGame() as UfoGame).camera.viewport.children
+        .whereType<SettlingOverlayComponent>()
+        .forEach((overlay) => overlay.removeFromParent());
+    (findGame() as UfoGame).camera.viewport.add(HudComponent());
+
+    (findGame() as UfoGame).session.loadBestScore(progressRepository.bestScore);
+    (findGame() as UfoGame).session.play();
   }
 
   @override
   void update(double dt) {
     super.update(dt);
+
+    if (_settlingTimer != null) {
+      _settlingTimer = _settlingTimer! - dt;
+      if (_settlingTimer! <= 0) {
+        _settlingTimer = null;
+        _finishSettling();
+      }
+    }
+
     if (_gameOverTimer != null) {
       _gameOverTimer = _gameOverTimer! - dt;
       if (_gameOverTimer! <= 0) {
@@ -274,6 +304,7 @@ class UfoWorld extends Forge2DWorld {
   void reset() {
     removeAll(children);
     _gameOverTimer = null;
+    _settlingTimer = null;
     _pendingScore = null;
     _pendingBestScore = null;
     (findGame() as UfoGame).camera.viewport.children

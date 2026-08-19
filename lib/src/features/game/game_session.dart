@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:unstable_flying_object/src/core/audio/sound_effects.dart';
 
-enum GameState { menu, playing, gameOver }
+enum GameState { menu, settling, playing, gameOver }
 
 class GameSession extends ChangeNotifier {
   GameState _state = GameState.menu;
@@ -23,6 +23,12 @@ class GameSession extends ChangeNotifier {
     notifyListeners();
   }
 
+  void settle() {
+    _score = 0;
+    _state = GameState.settling;
+    notifyListeners();
+  }
+
   void play() {
     _score = 0;
     _state = GameState.playing;
@@ -38,7 +44,7 @@ class GameSession extends ChangeNotifier {
   }
 
   void gameOver() {
-    if (_state == GameState.gameOver) return;
+    if (_state == GameState.gameOver || _state == GameState.settling) return;
 
     _state = GameState.gameOver;
     notifyListeners();
