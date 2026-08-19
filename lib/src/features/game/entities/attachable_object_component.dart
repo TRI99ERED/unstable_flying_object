@@ -25,7 +25,9 @@ mixin StickyBody on BodyComponent, ContactCallbacks {
       (game as UfoGame).weldManager.queueAttach(this, other, contact);
     }
 
-    if (isSticky && other is GroundComponent && (game as UfoGame).session.state == GameState.playing) {
+    if (isSticky &&
+        other is GroundComponent &&
+        (game as UfoGame).session.state == GameState.playing) {
       if (contact.fixtureA.userData is! BeamMarker &&
           contact.fixtureB.userData is! BeamMarker) {
         final ufoGame = game as UfoGame;
@@ -57,6 +59,7 @@ class AttachableObjectComponent extends BodyComponent
   @override
   bool get isSticky => attached;
   int get score => 0;
+  String get name => '';
 
   AttachableObjectComponent({required this.initialPosition}) {
     priority = 0;
@@ -77,6 +80,8 @@ class CrateComponent extends AttachableObjectComponent {
 
   @override
   int get score => 200;
+  @override
+  String get name => 'Crate';
 
   CrateComponent({required super.initialPosition}) {
     renderBody = false;
@@ -123,6 +128,8 @@ class CarComponent extends AttachableObjectComponent {
 
   @override
   int get score => 300;
+  @override
+  String get name => 'Car';
 
   CarComponent({required super.initialPosition}) {
     renderBody = false;
@@ -177,6 +184,8 @@ class ConeComponent extends AttachableObjectComponent {
 
   @override
   int get score => 100;
+  @override
+  String get name => 'Cone';
 
   ConeComponent({required super.initialPosition}) {
     renderBody = false;
