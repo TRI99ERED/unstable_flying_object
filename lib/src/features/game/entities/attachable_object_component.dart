@@ -315,7 +315,7 @@ class BarrelComponent extends AttachableObjectComponent {
   late final _BarrelVisual _visual;
 
   @override
-  int get score => 100;
+  int get score => 200;
   @override
   String get name => 'Barrel';
 
