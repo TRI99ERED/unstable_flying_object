@@ -7,6 +7,7 @@ import 'package:unstable_flying_object/src/core/audio/sound_effects.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ground_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ufo_component.dart';
 import 'package:unstable_flying_object/src/features/game/game_session.dart';
+import 'package:unstable_flying_object/src/features/game/systems/particle_system.dart' as ps;
 import 'package:unstable_flying_object/src/features/game/ufo_game.dart';
 import 'package:unstable_flying_object/src/features/themes/palette.dart';
 
@@ -40,6 +41,9 @@ mixin StickyBody on BodyComponent, ContactCallbacks {
         }
         ufoGame.weldManager.destroyAllJoints();
         ufoGame.shakeScreen();
+        world.children.whereType<ps.GameParticles>().firstOrNull?.spawnCrashExplosion(
+          (world as UfoWorld).ufo.body.position.clone(),
+        );
         (world as UfoWorld).showGameOverScreen(
           ufoGame.session.score,
           ufoGame.session.bestScore,

@@ -4,6 +4,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
 import 'package:unstable_flying_object/src/core/audio/sound_effects.dart';
 import 'package:unstable_flying_object/src/features/game/entities/attachable_object_component.dart';
+import 'package:unstable_flying_object/src/features/game/systems/particle_system.dart' as ps;
 import 'package:unstable_flying_object/src/features/game/ufo_game.dart';
 import 'package:unstable_flying_object/src/features/themes/palette.dart';
 
@@ -99,6 +100,9 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
         ufoGame.session.bestScore,
       );
       body.setType(BodyType.static);
+      world.children.whereType<ps.GameParticles>().firstOrNull?.spawnCrashExplosion(
+        body.position.clone(),
+      );
       SoundEffects.instance.playUfoLeave();
     }
 

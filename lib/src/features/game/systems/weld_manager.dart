@@ -4,6 +4,7 @@ import 'package:unstable_flying_object/src/features/game/entities/attachable_obj
 import 'package:unstable_flying_object/src/features/game/entities/flying_number_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/spawner_component.dart';
 import 'package:unstable_flying_object/src/features/game/game_session.dart';
+import 'package:unstable_flying_object/src/features/game/systems/particle_system.dart' as ps;
 import 'package:unstable_flying_object/src/features/game/ufo_game.dart';
 
 class WeldManager {
@@ -81,6 +82,9 @@ class WeldManager {
     session.onAttach(obj.score);
     (world as UfoWorld).progressRepository.save(session.bestScore);
     obj.pop();
+    world.children.whereType<ps.GameParticles>().firstOrNull?.spawnAttachSpark(
+      obj.body.worldCenter.clone(),
+    );
 
     world.add(
       FlyingNumberComponent(
