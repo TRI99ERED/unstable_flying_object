@@ -8,8 +8,30 @@ import 'package:unstable_flying_object/src/features/game/ufo_game.dart';
 import 'package:unstable_flying_object/src/features/themes/game_fonts.dart';
 import 'package:unstable_flying_object/src/features/themes/palette.dart';
 
+class _TitleParticle {
+  Vector2 position;
+  Vector2 velocity;
+  double lifetime;
+  double maxLifetime;
+  double size;
+
+  _TitleParticle({
+    required this.position,
+    required this.velocity,
+    required this.maxLifetime,
+    required this.size,
+  }) : lifetime = maxLifetime;
+
+  double get progress => 1.0 - lifetime / maxLifetime;
+}
+
 class TitleScene extends Component {
   TitleScene();
+
+  PolygonComponent? _ufo;
+  final List<_TitleParticle> _particles = [];
+  final Random _random = Random();
+  static const int kMaxParticles = 30;
 
   @override
   FutureOr<void> onLoad() async {
@@ -59,7 +81,41 @@ class TitleScene extends Component {
         InfiniteEffectController(SineEffectController(period: 2)),
       ),
     );
+    _ufo = ufo;
     add(ufo);
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    _particles.removeWhere((p) {
+      p.lifetime -= dt;
+      p.position += p.velocity * dt;
+      return p.lifetime <= 0;
+    });
+
+    if (_ufo == null) return;
+    if (_particles.length >= kMaxParticles) return;
+
+    final ufoCenter = _ufo!.absolutePosition + _ufo!.size / 2;
+    const spawnRate = 15.0;
+    final count = (spawnRate * dt).ceil().clamp(0, 2);
+
+    for (var i = 0; i < count; i++) {
+      _particles.add(_TitleParticle(
+        position: Vector2(
+          ufoCenter.x + (_random.nextDouble() - 0.5) * 8,
+          ufoCenter.y + 5 + _random.nextDouble() * 3,
+        ),
+        velocity: Vector2(
+          (_random.nextDouble() - 0.5) * 10,
+          15 + _random.nextDouble() * 20,
+        ),
+        maxLifetime: 0.4 + _random.nextDouble() * 0.3,
+        size: 0.8 + _random.nextDouble() * 0.6,
+      ));
+    }
   }
 
   @override
@@ -72,6 +128,19 @@ class TitleScene extends Component {
     );
     final overlayPaint = Palette.color27.paint();
     canvas.drawRect(overlayRect, overlayPaint);
+
+    final particlePaint = Paint();
+    for (final p in _particles) {
+      final progress = p.progress;
+      final alpha = progress < 0.15
+          ? progress / 0.15
+          : progress > 0.6
+              ? (1.0 - progress) / 0.4
+              : 1.0;
+      if (alpha <= 0) continue;
+      particlePaint.color = Palette.color19.color.withValues(alpha: alpha);
+      canvas.drawCircle(Offset(p.position.x, p.position.y), p.size, particlePaint);
+    }
 
     final centerX = UfoGame.kGameWidth / 2;
     final centerY = UfoGame.kGameHeight / 2;
