@@ -22,6 +22,7 @@ import 'package:unstable_flying_object/src/features/game/hud/hud_component.dart'
 import 'package:unstable_flying_object/src/features/game/hud/settling_overlay_component.dart';
 import 'package:unstable_flying_object/src/features/game/scenes/title_scene.dart';
 import 'package:unstable_flying_object/src/features/game/systems/weld_manager.dart';
+import 'package:unstable_flying_object/src/features/game/systems/wind_system.dart';
 import 'package:unstable_flying_object/src/features/game/systems/wrap_system.dart';
 import 'package:unstable_flying_object/src/features/themes/palette.dart';
 
@@ -255,6 +256,7 @@ class UfoWorld extends Forge2DWorld {
     );
 
     add(WrapSystem());
+    add(WindSystem());
 
     _settlingTimer = _settlingDuration;
   }
@@ -289,6 +291,7 @@ class UfoWorld extends Forge2DWorld {
       if (_gameOverTimer! <= 0) {
         _gameOverTimer = null;
         children.whereType<WrapSystem>().forEach((c) => c.removeFromParent());
+        children.whereType<WindSystem>().forEach((c) => c.removeFromParent());
         children.whereType<SpawnerComponent>().forEach(
           (c) => c.removeFromParent(),
         );
