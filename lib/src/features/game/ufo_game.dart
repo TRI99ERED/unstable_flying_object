@@ -16,12 +16,14 @@ import 'package:unstable_flying_object/src/features/game/entities/ground_compone
 import 'package:unstable_flying_object/src/features/game/entities/scenery_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/spawner_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/ufo_component.dart';
+import 'package:unstable_flying_object/src/features/game/systems/power_up_spawner.dart';
 import 'package:unstable_flying_object/src/features/game/game_session.dart';
 import 'package:unstable_flying_object/src/features/game/hud/game_over_overlay_component.dart';
 import 'package:unstable_flying_object/src/features/game/hud/hud_component.dart';
 import 'package:unstable_flying_object/src/features/game/hud/settling_overlay_component.dart';
 import 'package:unstable_flying_object/src/features/game/scenes/title_scene.dart';
 import 'package:unstable_flying_object/src/features/game/systems/weld_manager.dart';
+import 'package:unstable_flying_object/src/features/game/systems/power_up_manager.dart';
 import 'package:unstable_flying_object/src/features/game/systems/particle_system.dart' as ps;
 import 'package:unstable_flying_object/src/features/game/systems/wind_system.dart';
 import 'package:unstable_flying_object/src/features/game/systems/wrap_system.dart';
@@ -33,6 +35,7 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
 
   final GameSession session = GameSession();
   late final WeldManager weldManager = WeldManager(world, session);
+  late final PowerUpManager powerUpManager = PowerUpManager(this);
   final Vector2 moveIntent = Vector2.zero();
   final Set<LogicalKeyboardKey> _heldKeys = {};
 
@@ -74,6 +77,7 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
 
     if (session.state == GameState.playing) {
       session.updateCombo(dt);
+      powerUpManager.update(dt);
     }
   }
 
@@ -86,6 +90,7 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
 
     if (session.state == GameState.menu) {
       if (keysPressed.contains(LogicalKeyboardKey.enter)) {
+        powerUpManager.reset();
         world.spawnLevel();
         session.settle();
         camera.viewport.children.whereType<TitleScene>().forEach(
@@ -108,6 +113,7 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
 
       if (keysPressed.contains(LogicalKeyboardKey.keyR)) {
         weldManager.reset();
+        powerUpManager.reset();
         world.spawnLevel();
         session.settle();
         camera.viewport.children.whereType<SettlingOverlayComponent>().forEach(
@@ -117,6 +123,7 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
         return KeyEventResult.handled;
       } else if (keysPressed.contains(LogicalKeyboardKey.escape)) {
         weldManager.reset();
+        powerUpManager.reset();
         world.reset();
         session.menu();
         camera.viewport.add(TitleScene());
@@ -128,6 +135,7 @@ class UfoGame extends Forge2DGame<UfoWorld> with KeyboardEvents {
 
     if (keysPressed.contains(LogicalKeyboardKey.escape)) {
       weldManager.reset();
+      powerUpManager.reset();
       world.reset();
       session.menu();
       camera.viewport.add(TitleScene());
@@ -259,6 +267,7 @@ class UfoWorld extends Forge2DWorld {
     add(WrapSystem());
     add(WindSystem());
     add(ps.GameParticles());
+    add(PowerUpSpawner());
 
     _settlingTimer = _settlingDuration;
   }
@@ -295,6 +304,9 @@ class UfoWorld extends Forge2DWorld {
         children.whereType<WrapSystem>().forEach((c) => c.removeFromParent());
         children.whereType<WindSystem>().forEach((c) => c.removeFromParent());
         children.whereType<ps.GameParticles>().forEach((c) => c.removeFromParent());
+        children.whereType<PowerUpSpawner>().forEach(
+          (c) => c.removeFromParent(),
+        );
         children.whereType<SpawnerComponent>().forEach(
           (c) => c.removeFromParent(),
         );

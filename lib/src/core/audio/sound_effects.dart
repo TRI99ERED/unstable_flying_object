@@ -50,6 +50,10 @@ class SoundEffects {
     }
   }
 
+  void playPowerUp() {
+    unawaited(FlameAudio.play('powerup.wav', volume: _volume));
+  }
+
   void playUfoLeave() {
     unawaited(FlameAudio.play('ufo_leave.mp3', volume: _volume));
   }

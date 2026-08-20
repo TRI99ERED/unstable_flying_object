@@ -4,6 +4,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
 import 'package:unstable_flying_object/src/core/audio/sound_effects.dart';
 import 'package:unstable_flying_object/src/features/game/entities/attachable_object_component.dart';
+import 'package:unstable_flying_object/src/features/game/entities/power_up_component.dart';
 import 'package:unstable_flying_object/src/features/game/systems/particle_system.dart' as ps;
 import 'package:unstable_flying_object/src/features/game/ufo_game.dart';
 import 'package:unstable_flying_object/src/features/themes/palette.dart';
@@ -11,6 +12,9 @@ import 'package:unstable_flying_object/src/features/themes/palette.dart';
 class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
   static const double kBeamPull = 15;
   static const double kBeamDamping = 2;
+  static const double kSpeedBoostMultiplier = 1.5;
+  static const double kBeamBoostMultiplier = 2.0;
+  static const double kGravity = 9.8;
 
   final Vector2 initialPosition;
 
@@ -127,8 +131,16 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
     final rollScale =
         inertiaAboutCom / body.inertia * ufoGame.weldManager.controlScale;
 
+    final speedMultiplier =
+        ufoGame.powerUpManager.isActive(PowerUpType.speedBoost)
+            ? kSpeedBoostMultiplier
+            : 1.0;
+
     final rotatedIntent = Rot.mulVec2(body.transform.q, ufoGame.moveIntent);
-    body.applyForce(rotatedIntent * 100 * moveScale, point: com);
+    body.applyForce(
+      rotatedIntent * 100 * moveScale * speedMultiplier,
+      point: com,
+    );
     body.applyTorque(ufoGame.rollIntent * 10 * rollScale);
 
     const maxAngularVelocity = 5.0;
@@ -136,14 +148,31 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
       body.angularVelocity = body.angularVelocity.sign * maxAngularVelocity;
     }
 
+    if (ufoGame.powerUpManager.isActive(PowerUpType.antiGravity)) {
+      body.applyForce(
+        Vector2(0, -body.mass * kGravity),
+        point: body.worldCenter,
+      );
+      for (final obj in attached) {
+        obj.body.applyForce(
+          Vector2(0, -obj.body.mass * kGravity),
+          point: obj.body.worldCenter,
+        );
+      }
+    }
+
     if (beamActive) {
+      final beamMultiplier =
+          ufoGame.powerUpManager.isActive(PowerUpType.beamBoost)
+              ? kBeamBoostMultiplier
+              : 1.0;
       beamedObjects.removeWhere((o) => o.attached);
       for (var obj in beamedObjects) {
         final delta = body.worldCenter - obj.body.worldCenter;
         if (delta.length2 < 0.01) continue;
         final dir = delta.normalized();
         obj.body.applyForce(
-          dir * obj.body.mass * kBeamPull,
+          dir * obj.body.mass * kBeamPull * beamMultiplier,
           point: obj.body.worldCenter,
         );
         obj.body.applyForce(

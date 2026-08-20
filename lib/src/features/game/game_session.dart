@@ -11,6 +11,7 @@ class GameSession extends ChangeNotifier {
   int _bestScore = 0;
   int _comboLevel = 0;
   double? _comboTimer;
+  double scoreMultiplier = 1.0;
 
   GameState get state => _state;
   int get score => _score;
@@ -28,6 +29,7 @@ class GameSession extends ChangeNotifier {
     _score = 0;
     _state = GameState.menu;
     _resetCombo();
+    scoreMultiplier = 1.0;
     notifyListeners();
   }
 
@@ -35,6 +37,7 @@ class GameSession extends ChangeNotifier {
     _score = 0;
     _state = GameState.settling;
     _resetCombo();
+    scoreMultiplier = 1.0;
     notifyListeners();
   }
 
@@ -42,6 +45,7 @@ class GameSession extends ChangeNotifier {
     _score = 0;
     _state = GameState.playing;
     _resetCombo();
+    scoreMultiplier = 1.0;
     notifyListeners();
   }
 
@@ -56,7 +60,7 @@ class GameSession extends ChangeNotifier {
   void onAttach(int baseScore) {
     _comboLevel++;
     _comboTimer = comboDuration;
-    addScore(baseScore * _comboLevel);
+    addScore((baseScore * scoreMultiplier).round() * _comboLevel);
   }
 
   void updateCombo(double dt) {

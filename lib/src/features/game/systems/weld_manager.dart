@@ -90,7 +90,7 @@ class WeldManager {
       FlyingNumberComponent(
         position: obj.body.worldCenter.clone(),
         objectName: obj.name,
-        objectScore: obj.score * session.comboLevel,
+        objectScore: (obj.score * session.scoreMultiplier).round() * session.comboLevel,
       ),
     );
 
