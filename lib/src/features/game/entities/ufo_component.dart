@@ -5,12 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:unstable_flying_object/src/core/audio/sound_effects.dart';
 import 'package:unstable_flying_object/src/features/game/entities/attachable_object_component.dart';
 import 'package:unstable_flying_object/src/features/game/entities/power_up_component.dart';
-import 'package:unstable_flying_object/src/features/game/systems/particle_system.dart' as ps;
+import 'package:unstable_flying_object/src/features/game/systems/particle_system.dart'
+    as ps;
 import 'package:unstable_flying_object/src/features/game/ufo_game.dart';
 import 'package:unstable_flying_object/src/features/themes/palette.dart';
 
 class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
-  static const double kBeamPull = 15;
+  static const double kMoveSpeed = 100;
+  static const double kRollSpeed = 5;
+  static const double kBeamPull = 30;
   static const double kBeamDamping = 2;
   static const double kSpeedBoostMultiplier = 1.5;
   static const double kBeamBoostMultiplier = 2.0;
@@ -104,9 +107,10 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
         ufoGame.session.bestScore,
       );
       body.setType(BodyType.static);
-      world.children.whereType<ps.GameParticles>().firstOrNull?.spawnCrashExplosion(
-        body.position.clone(),
-      );
+      world.children
+          .whereType<ps.GameParticles>()
+          .firstOrNull
+          ?.spawnCrashExplosion(body.position.clone());
       SoundEffects.instance.playUfoLeave();
     }
 
@@ -133,17 +137,17 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
 
     final speedMultiplier =
         ufoGame.powerUpManager.isActive(PowerUpType.speedBoost)
-            ? kSpeedBoostMultiplier
-            : 1.0;
+        ? kSpeedBoostMultiplier
+        : 1.0;
 
     final rotatedIntent = Rot.mulVec2(body.transform.q, ufoGame.moveIntent);
     body.applyForce(
-      rotatedIntent * 100 * moveScale * speedMultiplier,
+      rotatedIntent * kMoveSpeed * moveScale * speedMultiplier,
       point: com,
     );
-    body.applyTorque(ufoGame.rollIntent * 10 * rollScale);
+    body.applyTorque(ufoGame.rollIntent * kRollSpeed * rollScale);
 
-    const maxAngularVelocity = 5.0;
+    const maxAngularVelocity = 1.0;
     if (body.angularVelocity.abs() > maxAngularVelocity) {
       body.angularVelocity = body.angularVelocity.sign * maxAngularVelocity;
     }
@@ -164,8 +168,8 @@ class UfoComponent extends BodyComponent with ContactCallbacks, StickyBody {
     if (beamActive) {
       final beamMultiplier =
           ufoGame.powerUpManager.isActive(PowerUpType.beamBoost)
-              ? kBeamBoostMultiplier
-              : 1.0;
+          ? kBeamBoostMultiplier
+          : 1.0;
       beamedObjects.removeWhere((o) => o.attached);
       for (var obj in beamedObjects) {
         final delta = body.worldCenter - obj.body.worldCenter;
